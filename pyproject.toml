@@ -5,7 +5,9 @@ description = "moodle clone"
 readme = "README.md"
 required-python = ">=3.13"
 dependencies = [
-
+    "SQLAlchemy==2.0.47",
+    "fastapi==0.133.1",
+    "pydantic-settings==2.13.1"
 ]
 
 

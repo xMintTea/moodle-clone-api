@@ -19,6 +19,10 @@ class SectionContent(BaseModel):
     last_change_date: Mapped[Optional[datetime]]
     order: Mapped[int]
     visibility_id: Mapped[int] = mapped_column(ForeignKey("visibility.id"))
+    
+    @declared_attr
+    def visibility(self) -> Mapped["Visibility"]:
+        return relationship()
  
 
 

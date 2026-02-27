@@ -1,0 +1,13 @@
+[project]
+name = "moodle_clone"
+version = "0.0.1"
+description = "moodle clone"
+readme = "README.md"
+required-python = ">=3.13"
+dependencies = [
+
+]
+
+
+[tool.pytest.ini_options]
+pythonpath = "."

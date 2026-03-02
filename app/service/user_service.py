@@ -11,8 +11,8 @@ class UserService:
         self._db = session
     
     
-    def list_users(self) -> list[User]:
-        return self._db.query(User).all()
+    def list_users(self, skip: int = 0, limit: int = 100) -> list[User]:
+        return self._db.query(User).offset(skip).limit(limit).all()
     
     def get_user(self, user_id: int) -> User | None:
         return self._db.query(User).filter(User.id == user_id).first()

@@ -7,7 +7,10 @@ required-python = ">=3.13"
 dependencies = [
     "SQLAlchemy==2.0.47",
     "fastapi==0.133.1",
-    "pydantic-settings==2.13.1"
+    "pydantic-settings==2.13.1",
+    "PyJWT==2.11.0",
+    "cryptography==46.0.5",
+    "bcrypt==5.0.0"
 ]
 
 

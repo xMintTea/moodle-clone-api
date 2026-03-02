@@ -21,3 +21,12 @@ class BaseModel(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
 
 session_local = sessionmaker(autoflush=False, autocommit=False, bind=engine)
+
+
+def get_db():
+    db = session_local()
+    
+    try:
+        return db
+    finally:
+        db.close()

@@ -14,8 +14,7 @@ class User(BaseModel):
     middle_name: Mapped[str] = mapped_column(String(50))
     last_name: Mapped[str] = mapped_column(String(50))
     email: Mapped[EmailStr] = mapped_column(String(), unique=True)
-    password: Mapped[str]
-    salt: Mapped[str]   
+    password: Mapped[bytes]
     user_type: Mapped[UserType] = mapped_column(Enum(UserType))
     user_status: Mapped[UserStatus] = mapped_column(Enum(UserStatus))
     

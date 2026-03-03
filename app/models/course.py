@@ -40,7 +40,7 @@ class Course(BaseModel):
     )
     
     visibility: Mapped["Visibility"] = relationship()
-    
+    sections: Mapped["CourseSection"] = relationship() 
 
 
 

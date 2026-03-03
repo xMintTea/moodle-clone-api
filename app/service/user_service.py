@@ -19,15 +19,8 @@ class UserService:
     
     def create_user(self, user_schema: UserSchema) -> User:
         
-        user = User(
-            first_name=user_schema.first_name,
-            middle_name=user_schema.middle_name,
-            last_name=user_schema.last_name,
-            email=user_schema.email,
-            password=pw_utils.hash_password(user_schema.password),
-            user_status=user_schema.user_status,
-            user_type=user_schema.user_type
-        )
+        user = User(**user_schema.model_dump())
+        user.password = pw_utils.hash_password(user_schema.password)
         
         self._db.add(user)
         self._db.commit()

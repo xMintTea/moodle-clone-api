@@ -17,7 +17,7 @@ class UserService:
         return list(self._db.scalars(stmt).all())
     
     def get_user(self, user_id: int) -> User | None:
-        return self._db.query(User).filter(User.id == user_id).first()
+        return self._db.get(User, user_id)
     
     def create_user(self, user_schema: UserSchema) -> User:
         

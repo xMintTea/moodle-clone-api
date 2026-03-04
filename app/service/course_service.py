@@ -16,7 +16,7 @@ class CourseService:
 
     
     def get_course(self, course_id: int) -> Course | None:
-        return self._db.query(Course).filter(Course.id == course_id).first()
+        return self._db.get(Course, course_id)
     
     
     def create_course(self, course_schema: CourseCreate) -> Course:

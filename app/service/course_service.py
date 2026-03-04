@@ -18,7 +18,7 @@ class CourseService:
         return self._db.query(Course).filter(Course.id == course_id).first()
     
     
-    def add_course(self, course_schema: CourseCreate) -> Course:
+    def create_course(self, course_schema: CourseCreate) -> Course:
         course = Course(**course_schema.model_dump())
         
         self._db.add(course)

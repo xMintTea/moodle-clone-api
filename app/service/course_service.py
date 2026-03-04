@@ -44,18 +44,6 @@ class CourseService:
         course = self._get_course_or_raise(course_id)
         self._db.delete(course)
         self._db.commit()
-    
-    
-    def add_section(self,section: CourseSection, course_id: int | None = None, course: Course | None = None):
-        if course_id is None and course is None:
-            raise ValueError("Either course_id or course must be provided")
-
-        if course is None:
-            course = self._get_course_or_raise(course_id) # pyright: ignore[reportArgumentType]
-        
-        course.sections.append(section)
-        self._db.commit()
-        self._db.refresh(course)
 
     
     def _get_course_or_raise(self, course_id: int) -> Course:

@@ -1,8 +1,8 @@
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import NoResultFound
 
-from models.course import Course
-from schemas.course import CourseSchema
+from models.course import Course, CourseSection
+from schemas.course import CourseCreate, CourseUpdate
 
 
 class CourseService:
@@ -18,7 +18,7 @@ class CourseService:
         return self._db.query(Course).filter(Course.id == course_id).first()
     
     
-    def add_course(self, course_schema: CourseSchema) -> Course:
+    def add_course(self, course_schema: CourseCreate) -> Course:
         course = Course(**course_schema.model_dump())
         
         self._db.add(course)
@@ -27,7 +27,7 @@ class CourseService:
         
         return course
 
-    def update_course(self, course_id: int, course_schema: CourseSchema) -> Course:
+    def update_course(self, course_id: int, course_schema: CourseUpdate) -> Course:
         course = self._get_course_or_raise(course_id)
         course.name = course_schema.name
         course.description = course_schema.description
@@ -44,8 +44,19 @@ class CourseService:
         course = self._get_course_or_raise(course_id)
         self._db.delete(course)
         self._db.commit()
-        
     
+    
+    def add_section(self,section: CourseSection, course_id: int | None = None, course: Course | None = None):
+        if course_id is None and course is None:
+            raise ValueError("Either course_id or course must be provided")
+
+        if course is None:
+            course = self._get_course_or_raise(course_id) # pyright: ignore[reportArgumentType]
+        
+        course.sections.append(section)
+        self._db.commit()
+        self._db.refresh(course)
+
     
     def _get_course_or_raise(self, course_id: int) -> Course:
         course = self.get_course(course_id)

@@ -11,7 +11,7 @@ from models.user import User
 class SectionContent(BaseModel):
     __abstract__ = True
     
-    section_id: Mapped[int] = mapped_column(ForeignKey("course_sections.id"))
+    section_id: Mapped[int] = mapped_column(ForeignKey("course_sections.id"), ondelete="CASCADE")
     creation_date: Mapped[datetime] = mapped_column(
         DateTime,
         server_default=text("CURRENT_TIMESTAMP")
@@ -40,23 +40,35 @@ class Course(BaseModel):
     )
     
     visibility: Mapped["Visibility"] = relationship()
-    sections: Mapped["CourseSection"] = relationship() 
+    sections: Mapped[list["CourseSection"]] = relationship(
+        back_populates="course",
+        cascade="all, delete-orphan"
+    ) 
 
 
 
 class CourseSection(BaseModel):
     __tablename__ = "course_sections"
     
-    course_id: Mapped[int] = mapped_column(ForeignKey("courses.id"))
+    course_id: Mapped[int] = mapped_column(ForeignKey("courses.id"), ondelete="CASCADE")
     
-    pages: Mapped["SectionPage"] = relationship()
-    tests: Mapped["Test"] = relationship()
+    pages: Mapped[list["SectionPage"]] = relationship(
+        back_populates="section",
+        cascade="all, delete-orphan"
+    )
+    tests: Mapped[list["Test"]] = relationship(
+        back_populates="section",
+        cascade="all, delete-orphan"
+    )
+    
+    course: Mapped[Course] = relationship(back_populates="sections")
 
 
 
 class SectionPage(SectionContent):
     __tablename__ = "section_pages"
     
+    section: Mapped[CourseSection] = relationship(back_populates="pages")
     
     # TODO: Good for now. Gonna figure out later how to store page content there. 
 
@@ -65,6 +77,8 @@ class Test(SectionContent):
     __tablename__ = "tests"
     
     deadline_date: Mapped[Optional[datetime]]
+    
+    section: Mapped[CourseSection] = relationship(back_populates="tests")
 
 
 class TestResult(BaseModel):

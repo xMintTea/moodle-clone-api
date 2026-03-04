@@ -1,3 +1,4 @@
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import NoResultFound
 
@@ -12,7 +13,8 @@ class UserService:
     
     
     def list_users(self, skip: int = 0, limit: int = 100) -> list[User]:
-        return self._db.query(User).offset(skip).limit(limit).all()
+        stmt = select(User).offset(skip).limit(limit)
+        return list(self._db.scalars(stmt).all())
     
     def get_user(self, user_id: int) -> User | None:
         return self._db.query(User).filter(User.id == user_id).first()

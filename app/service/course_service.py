@@ -1,3 +1,4 @@
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import NoResultFound
 
@@ -10,9 +11,9 @@ class CourseService:
         self._db = session
     
     def list_courses(self, skip: int = 0, limit: int = 100) -> list[Course]:
-        return self._db.query(Course).offset(skip).limit(limit).all()
-    
-    
+        stmt = select(Course).offset(skip).limit(limit)
+        return list(self._db.scalars(stmt).all())
+
     
     def get_course(self, course_id: int) -> Course | None:
         return self._db.query(Course).filter(Course.id == course_id).first()

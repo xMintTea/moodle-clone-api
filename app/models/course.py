@@ -51,6 +51,10 @@ class CourseSection(BaseModel):
     __tablename__ = "course_sections"
     
     course_id: Mapped[int] = mapped_column(ForeignKey("courses.id"), ondelete="CASCADE")
+    title: Mapped[str] = mapped_column(String(256))
+    description: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    order: Mapped[int]
+    visibility_id: Mapped[int] = mapped_column(ForeignKey("visibility.id"))
     
     pages: Mapped[list["SectionPage"]] = relationship(
         back_populates="section",
@@ -60,6 +64,7 @@ class CourseSection(BaseModel):
         back_populates="section",
         cascade="all, delete-orphan"
     )
+    visibility: Mapped["Visibility"] = relationship()
     
     course: Mapped[Course] = relationship(back_populates="sections")
 

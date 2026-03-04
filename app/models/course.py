@@ -11,7 +11,7 @@ from models.user import User
 class SectionContent(BaseModel):
     __abstract__ = True
     
-    section_id: Mapped[int] = mapped_column(ForeignKey("course_sections.id"), ondelete="CASCADE")
+    section_id: Mapped[int] = mapped_column(ForeignKey("course_sections.id", ondelete="CASCADE"))
     creation_date: Mapped[datetime] = mapped_column(
         DateTime,
         server_default=text("CURRENT_TIMESTAMP")
@@ -50,7 +50,7 @@ class Course(BaseModel):
 class CourseSection(BaseModel):
     __tablename__ = "course_sections"
     
-    course_id: Mapped[int] = mapped_column(ForeignKey("courses.id"), ondelete="CASCADE")
+    course_id: Mapped[int] = mapped_column(ForeignKey("courses.id", ondelete="CASCADE"))
     title: Mapped[str] = mapped_column(String(256))
     description: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     order: Mapped[int]

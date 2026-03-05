@@ -19,7 +19,7 @@ class UserService:
     def get_user(self, user_id: int) -> User | None:
         return self._db.get(User, user_id)
     
-    def create_user(self, user_schema: UserSchema) -> User:
+    def create_user(self, user_schema: UserCreate) -> User:
         
         user = User(**user_schema.model_dump())
         user.password = pw_utils.hash_password(user_schema.password)
@@ -29,7 +29,7 @@ class UserService:
         self._db.refresh(user)
         return user
 
-    def update_user(self, user_id: int, user_schema: UserSchema) -> User:
+    def update_user(self, user_id: int, user_schema: UserUpdate) -> User:
         user = self._get_user_or_raise(user_id)
         
         user.first_name = user_schema.first_name

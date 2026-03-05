@@ -2,8 +2,8 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import NoResultFound
 
-from models.course import CourseSection
-from schemas.course import SectionCreate, SectionUpdate
+from ..models.course import CourseSection
+from ..schemas.course import SectionCreate, SectionUpdate
 
 class SectionService:
     def __init__(self, session: Session):

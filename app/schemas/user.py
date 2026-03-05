@@ -1,7 +1,10 @@
 from pydantic import BaseModel, Field, EmailStr
 from typing import Annotated
 
-from models.context.enums import UserStatus, UserType
+from ..models.context.enums import UserStatus, UserType
+
+
+
 
 class UserSchema(BaseModel):
     first_name: Annotated[str,Field(..., title="Имя пользователя",

@@ -2,8 +2,8 @@ from sqlalchemy import String, Enum
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from pydantic import EmailStr
 
-from database import BaseModel
-from models.context.enums import UserStatus, UserType
+from ..database import BaseModel
+from ..models.context.enums import UserStatus, UserType
 
 
 

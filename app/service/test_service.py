@@ -3,8 +3,8 @@ from sqlalchemy.orm import Session
 from sqlalchemy.exc import NoResultFound
 from datetime import datetime
 
-from models.course import Test
-from schemas.course import TestCreate, TestUpdate
+from ..models.course import Test
+from ..schemas.course import TestCreate, TestUpdate
 
 class TestService:
     def __init__(self, session: Session) -> None:

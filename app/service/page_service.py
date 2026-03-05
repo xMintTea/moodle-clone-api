@@ -3,8 +3,8 @@ from sqlalchemy.orm import Session
 from sqlalchemy.exc import NoResultFound
 from datetime import datetime
 
-from models.course import SectionPage
-from schemas.course import PageCreate, PageUpdate
+from ..models.course import SectionPage
+from ..schemas.course import PageCreate, PageUpdate
 
 class PageService:
     def __init__(self, session: Session) -> None:

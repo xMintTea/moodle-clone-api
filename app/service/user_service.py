@@ -2,9 +2,9 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import NoResultFound
 
-from models.user import User
-from schemas.user import UserSchema
-from utils import password as pw_utils
+from ..models.user import User
+from ..schemas.user import UserCreate, UserUpdate
+from ..utils import password as pw_utils
 
 
 class UserService:

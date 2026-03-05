@@ -1,7 +1,7 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, DeclarativeBase, Mapped, mapped_column
 
-from core.config import config
+from .core.config import config
 
 
 SQL_DB_URL = config.db_url

@@ -2,8 +2,8 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import NoResultFound
 
-from models.course import Course, CourseSection
-from schemas.course import CourseCreate, CourseUpdate
+from ..models.course import Course
+from ..schemas.course import CourseCreate, CourseUpdate
 
 
 class CourseService:

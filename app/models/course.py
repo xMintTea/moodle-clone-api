@@ -3,8 +3,8 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship, declared_attr
 from typing import Optional, List
 from datetime import datetime
 
-from database import BaseModel
-from models.user import User
+from ..database import BaseModel
+from ..models.user import User
 
 
 

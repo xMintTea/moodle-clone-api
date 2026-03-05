@@ -7,4 +7,6 @@ from .core.register_exception_handlers import register_exception_handlers
 Base.metadata.create_all(engine)
 
 app = FastAPI()
+app.include_router(routerV1)
+
 

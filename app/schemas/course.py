@@ -14,7 +14,7 @@ class VisibilityBase(BaseModel):
 
 class CourseBase(BaseModel):
     name: Annotated[str, Field(...,min_length=4, max_length=256)]
-    description: Annotated[str, Field()]
+    description: Annotated[Optional[str], Field()]
     secret: Annotated[Optional[str], Field()]
     visibility_id: Annotated[int, Field(..., ge=1)]
 
@@ -82,7 +82,7 @@ class PageResponce(PageBase):
     # TODO: gonna figure out how annotate this properly.
     section_id: int
     creation_date: datetime
-    last_change_date: datetime
+    last_change_date: Optional[datetime]
     
     model_config = ConfigDict(from_attributes=True)
 

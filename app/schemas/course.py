@@ -54,7 +54,6 @@ class SectionUpdate(SectionCreate):
 class SectionResponse(SectionBase):
     id: Annotated[int, Field()]
     course_id: Annotated[int, Field()]
-    creation_date: Annotated[datetime, Field()]
     
     model_config = ConfigDict(from_attributes=True)
 

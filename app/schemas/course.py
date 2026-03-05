@@ -54,7 +54,7 @@ class SectionUpdate(SectionCreate):
     ...
 
 
-class SectionResponce(SectionBase):
+class SectionResponse(SectionBase):
     id: Annotated[int, Field()]
     course_id: Annotated[int, Field()]
     creation_date: Annotated[datetime, Field()]
@@ -78,7 +78,7 @@ class PageUpdate(PageCreate):
     ...
 
 
-class PageResponce(PageBase):
+class PageResponse(PageBase):
     # TODO: gonna figure out how annotate this properly.
     section_id: int
     creation_date: datetime
@@ -104,7 +104,7 @@ class TestUpdate(TestCreate):
     ...
     
 
-class TestResponce(TestBase):
+class TestResponse(TestBase):
     id: int
     section_id: int
     creation_date: datetime

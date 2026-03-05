@@ -1,6 +1,7 @@
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import NoResultFound
+from typing import Optional
 
 from ..models.course import Course
 from ..schemas.course import CourseCreate, CourseUpdate
@@ -15,7 +16,7 @@ class CourseService:
         return list(self._db.scalars(stmt).all())
 
     
-    def get_course(self, course_id: int) -> Course | None:
+    def get_course(self, course_id: int) -> Optional[Course]:
         return self._db.get(Course, course_id)
     
     

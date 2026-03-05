@@ -1,6 +1,7 @@
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import NoResultFound
+from typing import Optional
 
 from ..models.user import User
 from ..schemas.user import UserCreate, UserUpdate
@@ -16,7 +17,7 @@ class UserService:
         stmt = select(User).offset(skip).limit(limit)
         return list(self._db.scalars(stmt).all())
     
-    def get_user(self, user_id: int) -> User | None:
+    def get_user(self, user_id: int) -> Optional[User]:
         return self._db.get(User, user_id)
     
     def create_user(self, user_schema: UserCreate) -> User:

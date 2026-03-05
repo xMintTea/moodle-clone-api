@@ -2,6 +2,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import NoResultFound
 from datetime import datetime
+from typing import Optional
 
 from ..models.course import SectionPage
 from ..schemas.course import PageCreate, PageUpdate
@@ -20,7 +21,7 @@ class PageService:
 
 
 
-    def get_page(self, page_id: int) -> SectionPage | None:
+    def get_page(self, page_id: int) -> Optional[SectionPage]:
         return self._db.get(SectionPage, page_id)
 
 

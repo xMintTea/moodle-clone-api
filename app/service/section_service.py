@@ -1,6 +1,7 @@
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import NoResultFound
+from typing import Optional
 
 from ..models.course import CourseSection
 from ..schemas.course import SectionCreate, SectionUpdate
@@ -15,8 +16,8 @@ class SectionService:
         return list(self._db.scalars(stmt).all())
     
     
-    def get_section(self, section_id: int) -> CourseSection | None:
-        self._db.get(CourseSection, section_id)
+    def get_section(self, section_id: int) -> Optional[CourseSection]:
+        return self._db.get(CourseSection, section_id)
     
     
     def create_section(self, section_schema: SectionCreate) -> CourseSection:

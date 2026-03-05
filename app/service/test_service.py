@@ -2,6 +2,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import NoResultFound
 from datetime import datetime
+from typing import Optional
 
 from ..models.course import Test
 from ..schemas.course import TestCreate, TestUpdate
@@ -20,7 +21,7 @@ class TestService:
         return list(self._db.scalars(stmt).all())
 
 
-    def get_test(self, test_id: int) -> Test | None:
+    def get_test(self, test_id: int) -> Optional[Test]:
         return self._db.get(Test, test_id)
     
     

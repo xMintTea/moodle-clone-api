@@ -30,9 +30,6 @@ class CourseUpdate(CourseBase):
 
 
 class CourseResponce(CourseBase):
-    ...
-    
-    
     model_config = ConfigDict(from_attributes=True)
 
 

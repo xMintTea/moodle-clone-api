@@ -2,7 +2,7 @@ from pydantic import BaseModel, Field, EmailStr, ConfigDict
 from typing import Annotated
 
 from ..models.context.enums import UserStatus, UserType
-
+from ..utils.schemas_utils import optional
 
 
 
@@ -26,7 +26,7 @@ class UserCreate(UserBase):
     password: Annotated[str, Field(..., min_length=8, max_length=18)]
     email: Annotated[EmailStr, Field(..., max_length=32)]
 
-
+@optional
 class UserUpdate(UserCreate):
     ...
 

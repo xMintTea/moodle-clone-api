@@ -2,6 +2,8 @@ from pydantic import BaseModel, Field, EmailStr, ConfigDict
 from typing import Annotated, Optional
 from datetime import datetime
 
+from ..utils.schemas_utils import optional
+
 
 
 # -------- Visibility --------
@@ -23,7 +25,7 @@ class CourseBase(BaseModel):
 class CourseCreate(CourseBase):
     ...
     
-
+@optional
 class CourseUpdate(CourseBase):
     ...
 
@@ -46,7 +48,7 @@ class SectionBase(BaseModel):
 class SectionCreate(SectionBase):
     course_id: Annotated[int, Field(..., ge=1)]
 
-
+@optional
 class SectionUpdate(SectionCreate):
     ...
 
@@ -69,7 +71,7 @@ class PageBase(BaseModel):
 class PageCreate(PageBase):
     section_id: Annotated[int, Field(..., ge=1)]
 
-
+@optional
 class PageUpdate(PageCreate):
     ...
 
@@ -95,7 +97,7 @@ class TestBase(BaseModel):
 class TestCreate(TestBase):
     section_id: Annotated[int, Field(..., ge=1)]
 
-
+@optional
 class TestUpdate(TestCreate):
     ...
     

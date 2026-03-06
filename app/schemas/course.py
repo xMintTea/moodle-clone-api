@@ -77,10 +77,9 @@ class PageUpdate(PageCreate):
 
 
 class PageResponse(PageBase):
-    # TODO: gonna figure out how annotate this properly.
-    section_id: int
-    creation_date: datetime
-    last_change_date: Optional[datetime]
+    section_id: Annotated[int, Field(..., ge=1)]
+    creation_date: Annotated[datetime, Field(...)]
+    last_change_date: Annotated[Optional[datetime], Field()]
     
     model_config = ConfigDict(from_attributes=True)
 
@@ -103,9 +102,9 @@ class TestUpdate(TestCreate):
     
 
 class TestResponse(TestBase):
-    id: int
-    section_id: int
-    creation_date: datetime
-    last_change_date: Optional[datetime]
+    id: Annotated[int, Field(..., ge=1)]
+    section_id: Annotated[int, Field(..., ge=1)]
+    creation_date: Annotated[datetime, Field(...)]
+    last_change_date: Annotated[Optional[datetime], Field()]
 
     model_config = ConfigDict(from_attributes=True)

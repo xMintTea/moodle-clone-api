@@ -31,10 +31,11 @@ class CourseService:
 
     def update_course(self, course_id: int, course_schema: CourseUpdate) -> Course:
         course = self._get_course_or_raise(course_id)
-        course.name = course_schema.name
-        course.description = course_schema.description
-        course.secret = course_schema.secret
-        course.visibility_id = course_schema.visibility_id
+        
+        update_dict = course_schema.model_dump(exclude_unset=True)
+        
+        for field, value in update_dict.items():
+            setattr(course, field, value)
         
         self._db.commit()
         self._db.refresh(course)

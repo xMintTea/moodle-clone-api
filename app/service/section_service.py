@@ -32,11 +32,10 @@ class SectionService:
     def update_section(self,section_id: int, section_schema: SectionUpdate) -> CourseSection:
         section = self._get_section_or_raise(section_id)
         
-        section.title = section_schema.title
-        section.description = section_schema.description
-        section.order = section_schema.order
-        section.visibility_id = section_schema.visibility_id
-        section.course_id = section_schema.course_id
+        update_dict = section_schema.model_dump(exclude_unset=True)
+        
+        for field, value in update_dict.items():
+            setattr(section, field, value)
 
         
         self._db.commit()

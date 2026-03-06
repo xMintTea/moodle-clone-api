@@ -37,9 +37,11 @@ class PageService:
     def update_page(self, page_id: int, page_schema: PageUpdate) -> SectionPage:
         page = self._get_page_or_raise(page_id)
         
-        page.section_id = page_schema.section_id
-        page.order = page_schema.order
-        page.visibility_id = page_schema.visibility_id
+        update_dict = page_schema.model_dump(exclude_unset=True)
+        
+        for field, value in update_dict.items():
+            setattr(page, field, value)
+
         page.last_change_date = datetime.now()
 
         self._db.commit()

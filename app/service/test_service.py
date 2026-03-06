@@ -38,10 +38,11 @@ class TestService:
     def update_test(self, test_id: int, test_schema: TestUpdate) -> Test:
         test = self._get_test_or_raise(test_id)
         
-        test.section_id = test_schema.section_id
-        test.deadline_date = test_schema.deadline_date
-        test.order = test_schema.order
-        test.visibility_id = test_schema.visibility_id
+        update_dict = test_schema.model_dump(exclude_unset=True)
+        
+        for field, value in update_dict.items():
+            setattr(test, field, value)
+
         test.last_change_date = datetime.now()
         
         self._db.commit()

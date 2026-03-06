@@ -33,14 +33,15 @@ class UserService:
     def update_user(self, user_id: int, user_schema: UserUpdate) -> User:
         user = self._get_user_or_raise(user_id)
         
-        user.first_name = user_schema.first_name
-        user.middle_name = user_schema.middle_name
-        user.last_name = user_schema.last_name
-        user.email = user_schema.email
-        user.user_status = user_schema.user_status
-        user.user_type = user_schema.user_type
+
+        update_dict = user_schema.model_dump(exclude_unset=True)
+        
+        
+        for field, value in update_dict.items():
+            setattr(user, field, value)
+
             
-        if not pw_utils.validate_password(user_schema.password, user.password):
+        if "password" in update_dict.keys():
             user.password = pw_utils.hash_password(user_schema.password)
             
         self._db.commit()

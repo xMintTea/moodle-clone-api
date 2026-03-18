@@ -39,7 +39,9 @@ class Course(BaseModel):
     sections: Mapped[list["CourseSection"]] = relationship(
         back_populates="course",
         cascade="all, delete-orphan"
-    ) 
+    )
+    
+    users: Mapped[List[User]] = relationship(back_populates="courses", secondary="course_users")
 
 
 
@@ -95,18 +97,5 @@ class CourseUser(BaseModel):
     
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
     course_id: Mapped[int] = mapped_column(ForeignKey("courses.id"))
-    access_level_id: Mapped[int] = mapped_column(ForeignKey("access_levels.id"))
-    access_status_id: Mapped[int] = mapped_column(ForeignKey("access_statuses.id"))
-    date_of_join: Mapped[datetime]
-
-
-class AccessLevel(BaseModel):
-    __tablename__ = "access_levels"
-    
-    name: Mapped[str]
-
-
-class AccessStatus(BaseModel):
-    __tablename__ = "access_statuses"
-    
-    name: Mapped[str]
+    user: Mapped["User"] = relationship()
+    course: Mapped[Course] = relationship()

@@ -3,13 +3,8 @@ from typing import Annotated, Optional
 from datetime import datetime
 
 from ..utils.schemas_utils import optional
-
-
-
-# -------- Visibility --------
-
-class VisibilityBase(BaseModel):
-    name: Annotated[str, Field(...)]
+from .user import UserResponse
+from ..models.context.enums import Visibility
 
 
 # -------- Course --------
@@ -18,7 +13,7 @@ class CourseBase(BaseModel):
     name: Annotated[str, Field(...,min_length=4, max_length=256)]
     description: Annotated[Optional[str], Field()]
     secret: Annotated[Optional[str], Field()]
-    visibility_id: Annotated[int, Field(..., ge=1)]
+    visibility: Annotated[Visibility, Field(default=Visibility.VISIBLE_TO_CREATOR)]
 
 
 
@@ -32,6 +27,9 @@ class CourseUpdate(CourseBase):
 
 
 class CourseResponce(CourseBase):
+    id: int
+    users: list[UserResponse]
+    
     model_config = ConfigDict(from_attributes=True)
 
 
@@ -42,7 +40,7 @@ class SectionBase(BaseModel):
     title: Annotated[str, Field(..., min_length=1, max_length=256)]
     description: Annotated[Optional[str], Field()] = None
     order: Annotated[int, Field(..., ge=0)]
-    visibility_id: Annotated[int, Field(..., ge=1)]
+    visibility: Annotated[Visibility, Field(default=Visibility.VISIBLE_TO_CREATOR)]
 
 
 class SectionCreate(SectionBase):
@@ -64,7 +62,7 @@ class SectionResponse(SectionBase):
 
 class PageBase(BaseModel):
     order: Annotated[int, Field(..., ge=0)]
-    visibility_id: Annotated[int, Field(..., ge=0)]
+    visibility: Annotated[Visibility, Field(default=Visibility.VISIBLE_TO_CREATOR)]
 
 
 

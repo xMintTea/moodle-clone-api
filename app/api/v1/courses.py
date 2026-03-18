@@ -4,8 +4,9 @@ from typing import Optional
 from sqlalchemy.orm import Session
 
 from ...service.course_service import CourseService
+from ...service.course_user_service import CourseUserService
 from ...database import get_db
-from ...models.course import Course
+from ...models.course import Course, CourseUser
 from ...schemas.course import CourseCreate, CourseUpdate, CourseResponce
 from ...schemas.course_user import CreateCourseUser, UpdateCourseUser, CourseUserResponse
 
@@ -14,6 +15,11 @@ router = APIRouter(prefix="/courses", tags=["Courses"])
 
 def get_course_service(session: Session = Depends(get_db)) -> CourseService:
     return CourseService(session)
+
+
+def get_course_user_service(session: Session = Depends(get_db)) -> CourseUserService:
+    return CourseUserService(session)
+
 
 @router.get("/", response_model=list[CourseResponce])
 async def list_courses(
@@ -56,14 +62,21 @@ def delete_course(
     course_service.delete_course(course_id)
 
 
+@router.get("/{course_id}/members/", response_model=list[CourseUserResponse])
+def get_course_users(
+    course_id: int,
+    course_user_service: CourseUserService = Depends(get_course_user_service)   
+) -> list[CourseUser]:
+    return course_user_service.list_records_in_course(course_id)
+
 
 @router.post("/{course_id}/members/", response_model=CourseUserResponse)
 def add_user_to_the_course(
     course_id: int,
     courseuser_data: CreateCourseUser,
-    course_service: CourseService = Depends(get_course_service)   
-) -> Course:
-    ...
+    course_user_service: CourseUserService = Depends(get_course_user_service)   
+) -> CourseUser:
+    return course_user_service.add_record(course_id, courseuser_data)
     
 
 @router.put("/{course_id}/members/{user_id}", response_model=CourseUserResponse)

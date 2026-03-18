@@ -6,7 +6,6 @@ from ..database import BaseModel
 from ..models.context.enums import UserStatus, UserType
 
 
-
 class User(BaseModel):
     __tablename__ = "users"
     
@@ -17,6 +16,8 @@ class User(BaseModel):
     password: Mapped[bytes]
     user_type: Mapped[UserType] = mapped_column(Enum(UserType))
     user_status: Mapped[UserStatus] = mapped_column(Enum(UserStatus))
+    
+    courses: Mapped[list["Course"]] = relationship(back_populates="users", secondary="course_users") # type: ignore
     
 
     @property

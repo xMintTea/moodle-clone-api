@@ -29,6 +29,9 @@ class CourseUpdate(CourseBase):
 class CourseResponce(CourseBase):
     id: int
     users: list[UserResponse]
+    teachers: list[UserResponse]
+    assistants: list[UserResponse]
+    students: list[UserResponse]
     
     model_config = ConfigDict(from_attributes=True)
 

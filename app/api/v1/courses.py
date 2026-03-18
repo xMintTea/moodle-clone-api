@@ -15,7 +15,7 @@ def get_course_service(session: Session = Depends(get_db)) -> CourseService:
     return CourseService(session)
 
 @router.get("/", response_model=list[CourseResponce])
-def list_courses(
+async def list_courses(
     skip: int = Query(0, ge=0),
     limit: int = Query(100, ge=1, le=1000),
     course_service: CourseService = Depends(get_course_service)

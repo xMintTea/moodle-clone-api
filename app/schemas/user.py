@@ -18,8 +18,8 @@ class UserBase(BaseModel):
                                     max_length=50)]
 
 
-    user_type: Annotated[UserType, Field(...)]
-    user_status: Annotated[UserStatus, Field(...)]
+    user_type: Annotated[UserType, Field(default=UserType.DEFAULT)]
+    user_status: Annotated[UserStatus, Field(default=UserStatus.ACTIVE)]
 
 
 class UserCreate(UserBase):

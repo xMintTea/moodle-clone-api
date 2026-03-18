@@ -21,6 +21,10 @@ class CourseUserService:
         return self._db.get(CourseUser, record_id)
 
 
+    def list_records_in_course(self, course_id: int) -> list[CourseUser]:
+        stmt = select(CourseUser).filter(CourseUser.course_id == course_id)
+        return list(self._db.scalars(stmt).all())
+
     def list_students_in_course(self, course_id: int) -> list[User]:
         return self._list_users_by_role_id(course_id, UserType.DEFAULT)
 

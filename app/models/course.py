@@ -1,11 +1,11 @@
-from sqlalchemy import String,Text, ForeignKey, DateTime, text, Enum
+from sqlalchemy import String,Text, ForeignKey, DateTime, text, Enum, and_
 from sqlalchemy.orm import Mapped, mapped_column, relationship, declared_attr
 from typing import Optional, List
 from datetime import datetime
 
 from ..database import BaseModel
 from ..models.user import User
-from ..models.context.enums import CourseUserType, CourseAccessStatus, Visibility
+from ..models.context.enums import CourseAccessLevel, CourseAccessStatus, Visibility
 
 
 
@@ -43,6 +43,39 @@ class Course(BaseModel):
     
     users: Mapped[List[User]] = relationship(back_populates="courses", secondary="course_users")
 
+    teachers: Mapped[List[User]] = relationship(
+        secondary="course_users",
+        primaryjoin=lambda: and_(
+            Course.id == CourseUser.course_id,
+            CourseUser.access_level == CourseAccessLevel.TEACHER
+        ),
+        secondaryjoin=lambda: User.id == CourseUser.user_id,
+        viewonly=True,
+        overlaps="users"
+    )
+    
+    
+    assistants: Mapped[List[User]] = relationship(
+        secondary="course_users",
+        primaryjoin=lambda: and_(
+            Course.id == CourseUser.course_id,
+            CourseUser.access_level == CourseAccessLevel.ASSISTENT
+        ),
+        secondaryjoin=lambda: User.id == CourseUser.user_id,
+        viewonly=True,
+        overlaps="users"
+    )
+    
+    students: Mapped[List[User]] = relationship(
+        secondary="course_users",
+        primaryjoin=lambda: and_(
+            Course.id == CourseUser.course_id,
+            CourseUser.access_level == CourseAccessLevel.STUDENT
+        ),
+        secondaryjoin=lambda: User.id == CourseUser.user_id,
+        viewonly=True,
+        overlaps="users"
+    )
 
 
 class CourseSection(BaseModel):
@@ -97,7 +130,7 @@ class CourseUser(BaseModel):
     
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
     course_id: Mapped[int] = mapped_column(ForeignKey("courses.id"))
-    access_level: Mapped[CourseUserType] = mapped_column(Enum(CourseUserType), default=CourseUserType.STUDENT)
+    access_level: Mapped[CourseAccessLevel] = mapped_column(Enum(CourseAccessLevel), default=CourseAccessLevel.STUDENT)
     access_status: Mapped[CourseAccessStatus] = mapped_column(Enum(CourseAccessStatus), default=CourseAccessStatus.GRANTED)
     date_of_join: Mapped[datetime] = mapped_column(
         DateTime,

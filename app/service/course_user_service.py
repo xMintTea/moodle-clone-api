@@ -37,10 +37,11 @@ class CourseUserService:
         return self._list_users_by_role_id(course_id, UserType.ADMIN)
     
     
-    def add_record(self, courseuser_data: CreateCourseUser) -> CourseUser:
-        course_user = CourseUser(**courseuser_data.model_dump())
+    def add_record(self,course_id: int, courseuser_data: CreateCourseUser) -> CourseUser:
+        course_user = CourseUser(**courseuser_data.model_dump()) 
+        course_user.course_id = course_id
         
-        self._db.add(courseuser_data)
+        self._db.add(course_user)
         self._db.commit()
         self._db.refresh(course_user)
         

@@ -7,6 +7,7 @@ from ...service.course_service import CourseService
 from ...database import get_db
 from ...models.course import Course
 from ...schemas.course import CourseCreate, CourseUpdate, CourseResponce
+from ...schemas.course_user import CreateCourseUser, UpdateCourseUser, CourseUserResponse
 
 router = APIRouter(prefix="/courses", tags=["Courses"])
 
@@ -53,3 +54,43 @@ def delete_course(
     course_service: CourseService = Depends(get_course_service)
 ):
     course_service.delete_course(course_id)
+
+
+
+@router.post("/{course_id}/members/", response_model=CourseUserResponse)
+def add_user_to_the_course(
+    course_id: int,
+    courseuser_data: CreateCourseUser,
+    course_service: CourseService = Depends(get_course_service)   
+) -> Course:
+    ...
+    
+
+@router.put("/{course_id}/members/{user_id}", response_model=CourseUserResponse)
+def update_user_on_the_course(
+    course_id: int,
+    user_id: int,
+    courseuser_data: UpdateCourseUser,
+    course_service: CourseService = Depends(get_course_service)   
+) -> Course:
+    ...
+    
+@router.delete("/{course_id}/members/{user_id}")
+def delete_user_from_the_course(
+    course_id: int,
+    user_id: int,
+    course_service: CourseService = Depends(get_course_service)   
+):
+    ...
+    
+@router.get("/{course_id}/admins")
+def get_course_admins(
+    course_id: int
+):
+    ...
+    
+@router.get("/{course_id}/teacher")
+def get_course_teachers(
+    course_id: int
+):
+    ...

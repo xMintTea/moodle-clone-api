@@ -97,5 +97,14 @@ class CourseUser(BaseModel):
     
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
     course_id: Mapped[int] = mapped_column(ForeignKey("courses.id"))
+    access_level: Mapped[CourseUserType] = mapped_column(Enum(CourseUserType), default=CourseUserType.STUDENT)
+    access_status: Mapped[CourseAccessStatus] = mapped_column(Enum(CourseAccessStatus), default=CourseAccessStatus.GRANTED)
+    date_of_join: Mapped[datetime] = mapped_column(
+        DateTime,
+        server_default=text("CURRENT_TIMESTAMP")
+    )
+    
     user: Mapped["User"] = relationship()
     course: Mapped[Course] = relationship()
+
+

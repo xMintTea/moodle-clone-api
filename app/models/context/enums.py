@@ -11,7 +11,7 @@ class UserType(IntEnum):
     ADMIN = 3
     
 
-class CourseUserType(IntEnum):
+class CourseAccessLevel(IntEnum):
     STUDENT = 1
     ASSISTENT = 2
     TEACHER = 3

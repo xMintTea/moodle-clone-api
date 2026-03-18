@@ -1,10 +1,11 @@
-from sqlalchemy import String,Text, ForeignKey, DateTime, text
+from sqlalchemy import String,Text, ForeignKey, DateTime, text, Enum
 from sqlalchemy.orm import Mapped, mapped_column, relationship, declared_attr
 from typing import Optional, List
 from datetime import datetime
 
 from ..database import BaseModel
 from ..models.user import User
+from ..models.context.enums import CourseUserType, CourseAccessStatus, Visibility
 
 
 
@@ -18,11 +19,7 @@ class SectionContent(BaseModel):
     )
     last_change_date: Mapped[Optional[datetime]]
     order: Mapped[int]
-    visibility_id: Mapped[int] = mapped_column(ForeignKey("visibility.id"))
-    
-    @declared_attr
-    def visibility(self) -> Mapped["Visibility"]:
-        return relationship()
+    visibility: Mapped[Visibility] = mapped_column(Enum(Visibility), default=Visibility.VISIBLE_TO_CREATOR)
  
 
 
@@ -33,13 +30,12 @@ class Course(BaseModel):
     name: Mapped[str] = mapped_column(String(256))
     description: Mapped[Optional[str]] = mapped_column(Text)
     secret: Mapped[Optional[str]]
-    visibility_id: Mapped[int] = mapped_column(ForeignKey("visibility.id"))
+    visibility: Mapped[Visibility] = mapped_column(Enum(Visibility), default=Visibility.VISIBLE_TO_CREATOR)
     creation_date: Mapped[datetime] = mapped_column(
         DateTime,
         server_default=text("CURRENT_TIMESTAMP")
     )
     
-    visibility: Mapped["Visibility"] = relationship()
     sections: Mapped[list["CourseSection"]] = relationship(
         back_populates="course",
         cascade="all, delete-orphan"
@@ -54,7 +50,7 @@ class CourseSection(BaseModel):
     title: Mapped[str] = mapped_column(String(256))
     description: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     order: Mapped[int]
-    visibility_id: Mapped[int] = mapped_column(ForeignKey("visibility.id"))
+    visibility: Mapped[Visibility] = mapped_column(Enum(Visibility), default=Visibility.VISIBLE_TO_CREATOR)
     
     pages: Mapped[list["SectionPage"]] = relationship(
         back_populates="section",
@@ -64,7 +60,6 @@ class CourseSection(BaseModel):
         back_populates="section",
         cascade="all, delete-orphan"
     )
-    visibility: Mapped["Visibility"] = relationship()
     
     course: Mapped[Course] = relationship(back_populates="sections")
 
@@ -94,13 +89,6 @@ class TestResult(BaseModel):
     start_time: Mapped[datetime]
     end_time: Mapped[datetime]
     answers: Mapped[str] = mapped_column(Text)
-
-
-class Visibility(BaseModel):
-    __tablename__ = "visibility"
-    
-    name: Mapped[str]
-
 
 class CourseUser(BaseModel):
     __tablename__ = "course_users"

@@ -6,7 +6,7 @@ from ..database import BaseModel
 from ..models.context.enums import UserStatus, UserType
 
 
-class User(BaseModel):
+class User(Base):
     __tablename__ = "users"
     
     first_name: Mapped[str] = mapped_column(String(50))

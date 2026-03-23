@@ -5,8 +5,10 @@ from sqlalchemy.orm import Session
 
 from ...service.section_service import SectionService
 from ...database import get_db
-from ...models.course import CourseSection
-from ...schemas.course import SectionCreate, SectionUpdate, SectionResponse
+from ...models.course import CourseSection, Test, SectionPage
+from ...schemas.sections import SectionCreate, SectionUpdate, SectionResponse
+from ...schemas.tests import TestResponse
+from ...schemas.pages import PageResponse
 
 
 router = APIRouter(prefix="/sections", tags=["Sections"])
@@ -57,3 +59,20 @@ def delete_section(
     section_service: SectionService = Depends(get_section_service)
 ):
     section_service.delete_section(section_id)
+    
+    
+@router.get("/{section_id}/pages/", response_model=list[PageResponse])
+def get_pages_in_section(
+    section_id: Annotated[int, Path(ge=1)],
+    section_service: SectionService = Depends(get_section_service)
+) -> list[SectionPage]:
+    return section_service.get_pages(section_id)
+
+
+@router.get("/{section_id}/tests/", response_model=list[TestResponse])
+def get_tests_in_section(
+    section_id: Annotated[int, Path(ge=1)],
+    section_service: SectionService = Depends(get_section_service)
+) -> list[Test]:
+    return section_service.get_tests(section_id)
+

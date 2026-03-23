@@ -3,13 +3,13 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship, declared_attr
 from typing import Optional, List
 from datetime import datetime
 
-from ..database import BaseModel
+from ..database import Base
 from ..models.user import User
 from ..models.context.enums import CourseAccessLevel, CourseAccessStatus, Visibility
 
 
 
-class SectionContent(BaseModel):
+class SectionContent(Base):
     __abstract__ = True
     
     section_id: Mapped[int] = mapped_column(ForeignKey("course_sections.id", ondelete="CASCADE"))
@@ -78,7 +78,7 @@ class Course(BaseModel):
     )
 
 
-class CourseSection(BaseModel):
+class CourseSection(Base):
     __tablename__ = "course_sections"
     
     course_id: Mapped[int] = mapped_column(ForeignKey("courses.id", ondelete="CASCADE"))
@@ -116,7 +116,7 @@ class Test(SectionContent):
     section: Mapped[CourseSection] = relationship(back_populates="tests")
 
 
-class TestResult(BaseModel):
+class TestResult(Base):
     __tablename__ = "test_results"
     
     test_id: Mapped[int] = mapped_column(ForeignKey("tests.id"))
@@ -125,7 +125,7 @@ class TestResult(BaseModel):
     end_time: Mapped[datetime]
     answers: Mapped[str] = mapped_column(Text)
 
-class CourseUser(BaseModel):
+class CourseUser(Base):
     __tablename__ = "course_users"
     
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))

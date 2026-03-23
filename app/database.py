@@ -12,13 +12,9 @@ engine = create_engine(SQL_DB_URL, connect_args={
 
 
 class Base(DeclarativeBase):
-    ...
+    id: Mapped[int] = mapped_column(primary_key=True)
     
 
-class BaseModel(Base):
-    __abstract__ = True
-    
-    id: Mapped[int] = mapped_column(primary_key=True)
 
 session_local = sessionmaker(autoflush=False, autocommit=False, bind=engine)
 

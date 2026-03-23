@@ -1,6 +1,6 @@
-from fastapi import Depends, status, Query
+from fastapi import Depends, status, Query, Path
 from fastapi.routing import APIRouter
-from typing import Optional
+from typing import Optional, Annotated
 from sqlalchemy.orm import Session
 
 from ...service.test_service import TestService
@@ -25,14 +25,14 @@ def list_tests(
     return test_service.list_tests(skip=skip, limit=limit)
 
 
-@router.get("/test/{test_id}", response_model=TestResponse)
+@router.get("/{test_id}", response_model=TestResponse)
 def get_test(
-    test_id: int,
+    test_id: Annotated[int, Path(ge=1)],
     test_service: TestService = Depends(get_test_service)
 ) -> Optional[Test]:
     return test_service.get_test(test_id)
 
-@router.post("/", response_model=TestResponse)
+@router.post("/", response_model=TestResponse, status_code=status.HTTP_201_CREATED)
 def create_test(
     test_data: TestCreate,
     test_service: TestService = Depends(get_test_service)
@@ -41,17 +41,18 @@ def create_test(
 
 @router.put("/{test_id}", response_model=TestResponse, status_code=status.HTTP_202_ACCEPTED)
 def update_test(
-    test_id: int,
+    test_id: Annotated[int, Path(ge=1)],
     test_data: TestUpdate,
     test_service: TestService = Depends(get_test_service)
 ) -> Test:
     return test_service.update_test(test_id, test_data)
 
+
 @router.delete("/{test_id}",
     status_code=status.HTTP_204_NO_CONTENT
     )
 def delete_test(
-    test_id: int,
+    test_id: Annotated[int, Path(ge=1)],
     test_service: TestService = Depends(get_test_service)
 ):
     test_service.delete_test(test_id)

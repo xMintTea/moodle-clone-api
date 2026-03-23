@@ -1,6 +1,6 @@
-from fastapi import Depends, status, Query
+from fastapi import Depends, status, Query, Path
 from fastapi.routing import APIRouter
-from typing import Optional
+from typing import Optional, Annotated
 from sqlalchemy.orm import Session
 
 from ...service.page_service import PageService
@@ -15,9 +15,8 @@ router = APIRouter(prefix="/pages", tags=["Pages"])
 def get_page_service(session: Session = Depends(get_db)) -> PageService:
     return PageService(session)
 
-@router.get("/{section_id}", response_model=list[PageResponse])
+@router.get("/", response_model=list[PageResponse])
 def list_pages(
-    section_id: int,
     skip: int = Query(0, ge=0),
     limit: int = Query(100, ge=0, le=1000),
     page_service: PageService = Depends(get_page_service)
@@ -25,7 +24,7 @@ def list_pages(
     return page_service.list_pages(skip=skip, limit=limit)
 
 
-@router.get("/page/{page_id}", response_model=PageResponse)
+@router.get("/{page_id}", response_model=PageResponse)
 def get_page(
     page_id: Annotated[int, Path(ge=1)],
     page_service: PageService = Depends(get_page_service)
@@ -33,7 +32,7 @@ def get_page(
     return page_service.get_page(page_id)
 
 
-@router.post("/", response_model=PageResponse)
+@router.post("/", response_model=PageResponse, status_code=status.HTTP_201_CREATED)
 def create_page(
     page_data: PageCreate,
     page_service: PageService = Depends(get_page_service)
@@ -43,17 +42,18 @@ def create_page(
 
 @router.put("/{page_id}", response_model=PageResponse, status_code=status.HTTP_202_ACCEPTED)
 def update_page(
-    page_id: int,
+    page_id: Annotated[int, Path(ge=1)],
     page_data: PageUpdate,
     page_service: PageService = Depends(get_page_service)
 ) -> SectionPage:
     return page_service.update_page(page_id, page_data)
 
+
 @router.delete("/{page_id}",
     status_code=status.HTTP_204_NO_CONTENT
     )
 def delete_page(
-    page_id: int,
+    page_id: Annotated[int, Path(ge=1)],
     page_service: PageService = Depends(get_page_service)
 ):
     page_service.delete_page(page_id)

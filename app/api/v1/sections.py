@@ -1,6 +1,6 @@
-from fastapi import Depends, status, Query
+from fastapi import Depends, status, Query, Path
 from fastapi.routing import APIRouter
-from typing import Optional
+from typing import Optional, Annotated
 from sqlalchemy.orm import Session
 
 from ...service.section_service import SectionService
@@ -28,7 +28,7 @@ def list_sections(
 
 @router.get("/{section_id}", response_model=SectionResponse)
 def get_section(
-    section_id: int,
+    section_id: Annotated[int, Path(ge=1)],
     section_service: SectionService = Depends(get_section_service)
 ) -> Optional[CourseSection]:
     return section_service.get_section(section_id)
@@ -44,7 +44,7 @@ def create_section(
 
 @router.put("/{section_id}", response_model=SectionResponse)
 def update_section(
-    section_id: int,
+    section_id: Annotated[int, Path(ge=1)],
     section_data: SectionUpdate,
     section_service: SectionService = Depends(get_section_service)
 ) -> CourseSection:
@@ -55,7 +55,7 @@ def update_section(
     status_code=status.HTTP_204_NO_CONTENT
     )
 def delete_section(
-    section_id: int,
+    section_id: Annotated[int, Path(ge=1)],
     section_service: SectionService = Depends(get_section_service)
 ):
     section_service.delete_section(section_id)

@@ -1,6 +1,6 @@
-from fastapi import Depends, status, Query
+from fastapi import Depends, status, Query, Path
 from fastapi.routing import APIRouter
-from typing import Optional
+from typing import Optional, Annotated
 from sqlalchemy.orm import Session
 
 from ...service.user_service import UserService
@@ -26,7 +26,7 @@ def get_users(
 
 @router.get("/{user_id}", response_model=UserResponse)
 def get_user(
-    user_id: int,
+    user_id: Annotated[int, Path(ge=1)],
     user_service: UserService = Depends(get_user_service)
     ) -> Optional[User]:
     return user_service.get_user(user_id)
@@ -45,7 +45,7 @@ def create_user(
     response_model=UserResponse
     )
 def update_user(
-    user_id: int,
+    user_id: Annotated[int, Path(ge=1)],
     user_data: UserUpdate,
     user_service: UserService = Depends(get_user_service)
     ) -> User:
@@ -57,7 +57,7 @@ def update_user(
     status_code=status.HTTP_204_NO_CONTENT,
     )
 def delete_user(
-    user_id: int,
+    user_id: Annotated[int, Path(ge=1)],
     user_service: UserService = Depends(get_user_service)
 ):
     user_service.delete_user(user_id)

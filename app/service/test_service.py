@@ -5,19 +5,15 @@ from datetime import datetime
 from typing import Optional
 
 from ..models.course import Test
-from ..schemas.course import TestCreate, TestUpdate
+from ..schemas.tests import TestCreate, TestUpdate
 
 class TestService:
     def __init__(self, session: Session) -> None:
         self._db = session
     
     
-    def list_tests(self, section_id: int, skip: int = 0, limit: int = 100) -> list[Test]:
-        stmt = select(Test)\
-                .filter(Test.section_id == section_id)\
-                .offset(skip)\
-                .limit(limit)
-        
+    def list_tests(self, skip: int = 0, limit: int = 100) -> list[Test]:
+        stmt = select(Test).offset(skip).limit(limit)
         return list(self._db.scalars(stmt).all())
 
 

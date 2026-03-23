@@ -39,7 +39,8 @@ def create_page(
 ) -> SectionPage:
     return page_service.create_page(page_data)
 
-@router.put("/{page_id}", response_model=PageResponse)
+
+@router.put("/{page_id}", response_model=PageResponse, status_code=status.HTTP_202_ACCEPTED)
 def update_page(
     page_id: int,
     page_data: PageUpdate,

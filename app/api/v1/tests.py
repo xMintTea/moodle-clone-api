@@ -38,7 +38,7 @@ def create_test(
 ) -> Test:
     return test_service.create_test(test_data)
 
-@router.put("/{test_id}", response_model=TestResponse)
+@router.put("/{test_id}", response_model=TestResponse, status_code=status.HTTP_202_ACCEPTED)
 def update_test(
     test_id: int,
     test_data: TestUpdate,

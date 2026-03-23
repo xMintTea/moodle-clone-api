@@ -37,7 +37,7 @@ def get_course(
 ) -> Optional[Course]:
     return course_service.get_course(course_id)
 
-@router.post("/", response_model=CourseResponce)
+@router.post("/", response_model=CourseResponce, status_code=status.HTTP_201_CREATED)
 def create_course(
     course_data: CourseCreate,
     course_service: CourseService = Depends(get_course_service)
@@ -70,7 +70,10 @@ def get_course_users(
     return course_user_service.list_records_in_course(course_id)
 
 
-@router.post("/{course_id}/members/", response_model=CourseUserResponse)
+@router.post(
+    "/{course_id}/members/",
+    response_model=CourseUserResponse,
+    status_code=status.HTTP_202_ACCEPTED)
 def add_user_to_the_course(
     course_id: int,
     courseuser_data: CreateCourseUser,
@@ -79,7 +82,10 @@ def add_user_to_the_course(
     return course_user_service.add_record(course_id, courseuser_data)
     
 
-@router.put("/{course_id}/members/{user_id}", response_model=CourseUserResponse)
+@router.put(
+    "/{course_id}/members/{user_id}",
+    response_model=CourseUserResponse,
+    status_code=status.HTTP_202_ACCEPTED)
 def update_user_on_the_course(
     course_id: int,
     user_id: int,
@@ -88,7 +94,7 @@ def update_user_on_the_course(
 ) -> Course:
     ...
     
-@router.delete("/{course_id}/members/{user_id}")
+@router.delete("/{course_id}/members/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_user_from_the_course(
     course_id: int,
     user_id: int,

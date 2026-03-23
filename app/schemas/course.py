@@ -1,10 +1,10 @@
-from pydantic import BaseModel, Field, EmailStr, ConfigDict
+from pydantic import BaseModel, Field, ConfigDict
 from typing import Annotated, Optional
-from datetime import datetime
 
 from ..utils.schemas_utils import optional
 from .user import UserResponse
 from ..models.context.enums import Visibility
+from .sections import SectionResponse
 
 
 # -------- Course --------
@@ -32,80 +32,7 @@ class CourseResponce(CourseBase):
     teachers: list[UserResponse]
     assistants: list[UserResponse]
     students: list[UserResponse]
+    sections: list[SectionResponse]
     
     model_config = ConfigDict(from_attributes=True)
 
-
-
-# -------- Sections --------
-
-class SectionBase(BaseModel):
-    title: Annotated[str, Field(..., min_length=1, max_length=256)]
-    description: Annotated[Optional[str], Field()] = None
-    order: Annotated[int, Field(..., ge=0)]
-    visibility: Annotated[Visibility, Field(default=Visibility.VISIBLE_TO_CREATOR)]
-
-
-class SectionCreate(SectionBase):
-    course_id: Annotated[int, Field(..., ge=1)]
-
-@optional
-class SectionUpdate(SectionCreate):
-    ...
-
-
-class SectionResponse(SectionBase):
-    id: Annotated[int, Field()]
-    course_id: Annotated[int, Field()]
-    
-    model_config = ConfigDict(from_attributes=True)
-
-
-# -------- Sections --------
-
-class PageBase(BaseModel):
-    order: Annotated[int, Field(..., ge=0)]
-    visibility: Annotated[Visibility, Field(default=Visibility.VISIBLE_TO_CREATOR)]
-
-
-
-class PageCreate(PageBase):
-    section_id: Annotated[int, Field(..., ge=1)]
-
-@optional
-class PageUpdate(PageCreate):
-    ...
-
-
-class PageResponse(PageBase):
-    section_id: Annotated[int, Field(..., ge=1)]
-    creation_date: Annotated[datetime, Field(...)]
-    last_change_date: Annotated[Optional[datetime], Field()]
-    
-    model_config = ConfigDict(from_attributes=True)
-
-
-
-# -------- Test --------
-
-class TestBase(BaseModel):
-    deadline_date: Annotated[Optional[datetime], Field()] = None
-    order: Annotated[int, Field(..., ge=0)]
-    visibility_id: Annotated[int, Field(..., ge=1)]
-
-
-class TestCreate(TestBase):
-    section_id: Annotated[int, Field(..., ge=1)]
-
-@optional
-class TestUpdate(TestCreate):
-    ...
-    
-
-class TestResponse(TestBase):
-    id: Annotated[int, Field(..., ge=1)]
-    section_id: Annotated[int, Field(..., ge=1)]
-    creation_date: Annotated[datetime, Field(...)]
-    last_change_date: Annotated[Optional[datetime], Field()]
-
-    model_config = ConfigDict(from_attributes=True)

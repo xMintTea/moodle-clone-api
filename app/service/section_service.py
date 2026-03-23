@@ -3,8 +3,8 @@ from sqlalchemy.orm import Session
 from sqlalchemy.exc import NoResultFound
 from typing import Optional
 
-from ..models.course import CourseSection
-from ..schemas.course import SectionCreate, SectionUpdate
+from ..models.course import CourseSection, Test, SectionPage
+from ..schemas.sections import SectionCreate, SectionUpdate
 
 class SectionService:
     def __init__(self, session: Session):
@@ -47,6 +47,15 @@ class SectionService:
         section = self._get_section_or_raise(section_id)
         self._db.delete(section)
         self._db.commit()
+    
+    
+    def get_tests(self, section_id: int) -> list[Test]:
+        section = self._get_section_or_raise(section_id)
+        return section.tests
+    
+    def get_pages(self, section_id: int) -> list[SectionPage]:
+        section = self._get_section_or_raise(section_id)
+        return section.pages
     
     def _get_section_or_raise(self, section_id: int) -> CourseSection:
         section = self.get_section(section_id)

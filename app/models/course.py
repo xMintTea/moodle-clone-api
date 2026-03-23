@@ -12,29 +12,36 @@ from ..models.context.enums import CourseAccessLevel, CourseAccessStatus, Visibi
 class SectionContent(Base):
     __abstract__ = True
     
-    section_id: Mapped[int] = mapped_column(ForeignKey("course_sections.id", ondelete="CASCADE"))
+    title: Mapped[str]
+    description: Mapped[Optional[str]] = mapped_column(Text)
+    
     creation_date: Mapped[datetime] = mapped_column(
         DateTime,
         server_default=text("CURRENT_TIMESTAMP")
     )
     last_change_date: Mapped[Optional[datetime]]
+    due_date: Mapped[Optional[datetime]]
+    
     order: Mapped[int]
     visibility: Mapped[Visibility] = mapped_column(Enum(Visibility), default=Visibility.VISIBLE_TO_CREATOR)
- 
 
+    max_points: Mapped[int] = mapped_column(default=0)
 
+    section_id: Mapped[int] = mapped_column(ForeignKey("course_sections.id", ondelete="CASCADE"))
    
-class Course(BaseModel):
+class Course(Base):
     __tablename__ = "courses"
     
     name: Mapped[str] = mapped_column(String(256))
     description: Mapped[Optional[str]] = mapped_column(Text)
-    secret: Mapped[Optional[str]]
-    visibility: Mapped[Visibility] = mapped_column(Enum(Visibility), default=Visibility.VISIBLE_TO_CREATOR)
+    
     creation_date: Mapped[datetime] = mapped_column(
         DateTime,
         server_default=text("CURRENT_TIMESTAMP")
     )
+    
+    secret: Mapped[Optional[str]]
+    visibility: Mapped[Visibility] = mapped_column(Enum(Visibility), default=Visibility.VISIBLE_TO_CREATOR)
     
     sections: Mapped[list["CourseSection"]] = relationship(
         back_populates="course",
@@ -81,11 +88,13 @@ class Course(BaseModel):
 class CourseSection(Base):
     __tablename__ = "course_sections"
     
-    course_id: Mapped[int] = mapped_column(ForeignKey("courses.id", ondelete="CASCADE"))
     title: Mapped[str] = mapped_column(String(256))
     description: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    
     order: Mapped[int]
     visibility: Mapped[Visibility] = mapped_column(Enum(Visibility), default=Visibility.VISIBLE_TO_CREATOR)
+    
+    course_id: Mapped[int] = mapped_column(ForeignKey("courses.id", ondelete="CASCADE"))
     
     pages: Mapped[list["SectionPage"]] = relationship(
         back_populates="section",
@@ -104,8 +113,29 @@ class SectionPage(SectionContent):
     __tablename__ = "section_pages"
     
     section: Mapped[CourseSection] = relationship(back_populates="pages")
+    submitted_pages: Mapped[list["SubmittedPage"]] = relationship(back_populates="page") 
     
-    # TODO: Good for now. Gonna figure out later how to store page content there. 
+    
+    # TODO: Good for now. Gonna figure out later how to store page content there.
+
+
+
+class SubmittedPage(Base):
+    __tablename__ = "submitted_page"
+    
+    page_id: Mapped[int] = mapped_column(ForeignKey("section_pages.id"))
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
+    submitted: Mapped[bool]= mapped_column(default=False)
+    submittion_date: Mapped[datetime] = mapped_column(
+        DateTime,
+        server_default=text("CURRENT_TIMESTAMP")
+    )
+    reviewed: Mapped[bool] = mapped_column(default=False)
+    reviewed_date: Mapped[Optional[datetime]]
+    points: Mapped[int] = mapped_column(default=0)
+    
+    page: Mapped[SectionPage] = relationship(back_populates="submitted_pages")
+    user: Mapped[User] = relationship()
 
 
 class Test(SectionContent):

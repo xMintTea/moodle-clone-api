@@ -5,6 +5,7 @@ from datetime import datetime
 from typing import Optional
 
 from ..models.course import SectionPage, SubmittedPage
+from ..models.file import File
 from ..schemas.pages import PageCreate, PageUpdate
 from ..schemas.submission import PageSubmissionCreate, PageSubmissionUpdate
 
@@ -100,9 +101,43 @@ class PageService:
         
         return submittion
         
-        
     
-    def _get_page_or_raise(self, page_id) -> SectionPage:
+    
+    def add_file_to_page(self, page_id: int, file_id: int) -> SectionPage:
+        page = self._get_page_or_raise(page_id)
+        file = self._get_file_or_raise(file_id)
+        
+        page.files.append(file)
+        
+        self._db.commit()
+        self._db.refresh(page)
+        
+        return page
+    
+    
+    def add_file_to_submittion(self, submittion_id: int, file_id: int) -> SubmittedPage:
+        submittion = self._get_submittion_or_raise(submittion_id)
+        file = self._get_file_or_raise(file_id)
+        
+        submittion.files.append(file)
+        
+        self._db.commit()
+        self._db.refresh(submittion)
+        
+        return submittion
+    
+    
+    
+    def _get_file_or_raise(self, file_id: int) -> File:
+        file = self._db.get(File, file_id)
+        
+        if not file:
+            raise NoResultFound
+        
+        return file
+    
+    
+    def _get_page_or_raise(self, page_id: int) -> SectionPage:
         page = self.get_page(page_id)
         if not page:
             raise NoResultFound

@@ -77,7 +77,7 @@ def get_submittion(
     return page_service.get_submittion(submittion_id)
 
 @router.post(
-    "/{page_id}/submissions/",
+    "/{page_id}/submittions/",
     response_model=PageSubmissionResponse,
     status_code=status.HTTP_201_CREATED)
 def create_page_submittion(
@@ -89,7 +89,7 @@ def create_page_submittion(
 
 
 @router.put(
-    "/submissions/{submittion_id}",
+    "/submittions/{submittion_id}",
     response_model=PageSubmissionResponse,
     status_code=status.HTTP_202_ACCEPTED)
 def update_page_submission(
@@ -98,3 +98,31 @@ def update_page_submission(
     page_service: PageService = Depends(get_page_service)
 ) -> SubmittedPage:
     return page_service.update_submittion(submittion_id, submission_data)
+
+
+
+@router.put(
+    "/{page_id}/files/{file_id}",
+    response_model=PageResponse,
+    status_code=status.HTTP_202_ACCEPTED
+)
+def add_file_to_the_page(
+    page_id: Annotated[int, Path(ge=1)],
+    file_id: Annotated[int, Path(ge=1)],
+    page_service: PageService = Depends(get_page_service)
+) -> SectionPage:
+    return page_service.add_file_to_page(page_id, file_id)
+
+@router.put(
+    "/submittions/{submittion_id}/files/{file_id}",
+    response_model=PageSubmissionResponse,
+    status_code=status.HTTP_202_ACCEPTED
+)
+def add_file_to_the_submittion(
+    submittion_id: Annotated[int, Path(ge=1)],
+    file_id: Annotated[int, Path(ge=1)],
+    page_service: PageService = Depends(get_page_service)
+) -> SubmittedPage:
+    return page_service.add_file_to_submittion(submittion_id, file_id)
+
+

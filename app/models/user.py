@@ -24,3 +24,7 @@ class User(Base):
     def full_name(self) -> str:
         return f"{self.first_name} {self.last_name} {self.middle_name}"
     
+
+    
+    def __str__(self) -> EmailStr:
+        return f"{self.full_name}[{self.id}]"

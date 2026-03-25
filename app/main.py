@@ -1,9 +1,11 @@
 from .database import Base, engine
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from sqladmin import Admin
 
 from .api.v1 import router as routerV1
 from .core.register_exception_handlers import register_exception_handlers
+from .admin import register_views
 
 Base.metadata.create_all(engine)
 
@@ -21,3 +23,5 @@ app.add_middleware(
 )
 
 
+admin = Admin(app, engine)
+register_views(admin)

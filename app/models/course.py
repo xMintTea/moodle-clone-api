@@ -113,6 +113,8 @@ class CourseSection(Base):
 class SectionPage(SectionContent):
     __tablename__ = "section_pages"
     
+    comment: Mapped[Optional[str]] = mapped_column(Text)
+    
     section: Mapped[CourseSection] = relationship(back_populates="pages")
     submitted_pages: Mapped[list["SubmittedPage"]] = relationship(back_populates="page") 
     
@@ -141,11 +143,13 @@ class SubmittedPage(Base):
     
     page_id: Mapped[int] = mapped_column(ForeignKey("section_pages.id"))
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
-    submitted: Mapped[bool]= mapped_column(default=False)
+    submitted: Mapped[bool]= mapped_column(default=True)
     submittion_date: Mapped[datetime] = mapped_column(
         DateTime,
         server_default=text("CURRENT_TIMESTAMP")
     )
+    comment: Mapped[Optional[str]] = mapped_column(Text)
+    feedback: Mapped[Optional[str]] = mapped_column(Text)
     reviewed: Mapped[bool] = mapped_column(default=False)
     reviewed_date: Mapped[Optional[datetime]]
     points: Mapped[int] = mapped_column(default=0)

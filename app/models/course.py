@@ -5,6 +5,7 @@ from datetime import datetime
 
 from ..database import Base
 from ..models.user import User
+from ..models.file import File
 from ..models.context.enums import CourseAccessLevel, CourseAccessStatus, Visibility
 
 
@@ -115,9 +116,24 @@ class SectionPage(SectionContent):
     section: Mapped[CourseSection] = relationship(back_populates="pages")
     submitted_pages: Mapped[list["SubmittedPage"]] = relationship(back_populates="page") 
     
+    files: Mapped[list[File]] = relationship(back_populates="pages", secondary="files_on_page")
     
     # TODO: Good for now. Gonna figure out later how to store page content there.
 
+
+
+class FilesOnPage(Base):
+    __tablename__ = "files_on_page"
+    
+    file_id: Mapped[int] = mapped_column(ForeignKey("files.id"))
+    page_id: Mapped[int] = mapped_column(ForeignKey("section_pages.id"))
+
+
+class FilesOnSubmission(Base):
+    __tablename__ = "files_on_submittion"
+    
+    file_id: Mapped[int] = mapped_column(ForeignKey("files.id"))
+    submittion_id: Mapped[int] = mapped_column(ForeignKey("submitted_page.id"))
 
 
 class SubmittedPage(Base):
@@ -136,6 +152,8 @@ class SubmittedPage(Base):
     
     page: Mapped[SectionPage] = relationship(back_populates="submitted_pages")
     user: Mapped[User] = relationship()
+    
+    files: Mapped[list[File]] = relationship(back_populates="submittions", secondary="files_on_submittion")
 
 
 class Test(SectionContent):

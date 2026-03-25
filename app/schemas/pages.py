@@ -4,6 +4,7 @@ from datetime import datetime
 
 from ..utils.schemas_utils import optional
 from ..models.context.enums import Visibility
+from ..schemas.files import FileResponse
 
 
 # -------- Pages --------
@@ -11,6 +12,7 @@ from ..models.context.enums import Visibility
 class PageBase(BaseModel):
     title: Annotated[str, Field()]
     description: Annotated[Optional[str], Field()]
+    comment: Annotated[Optional[str], Field()]
     order: Annotated[int, Field(..., ge=0)]
     visibility: Annotated[Visibility, Field(default=Visibility.VISIBLE_TO_CREATOR)]
     due_date: Annotated[Optional[datetime], Field()]
@@ -32,6 +34,6 @@ class PageResponse(PageBase):
     creation_date: Annotated[datetime, Field(...)]
     last_change_date: Annotated[Optional[datetime], Field()]
     visibility: Visibility
-
+    files: Annotated[list[FileResponse], Field()]
     
     model_config = ConfigDict(from_attributes=True)

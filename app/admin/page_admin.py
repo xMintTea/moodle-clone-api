@@ -11,3 +11,7 @@ class PageAdmin(ModelView, model=SectionPage):
         SectionPage.last_change_date
     ]
 
+
+    form_excluded_columns = [
+        SectionPage.creation_date
+    ]

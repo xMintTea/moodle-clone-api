@@ -84,6 +84,10 @@ class Course(Base):
         viewonly=True,
         overlaps="users"
     )
+    
+    
+    def __str__(self) -> str:
+        return f"{self.name}[{self.id}]"
 
 
 class CourseSection(Base):
@@ -109,6 +113,9 @@ class CourseSection(Base):
     course: Mapped[Course] = relationship(back_populates="sections")
 
 
+    def __str__(self) -> str:
+        return f"{self.title}[{self.id}]"
+
 
 class SectionPage(SectionContent):
     __tablename__ = "section_pages"
@@ -121,6 +128,10 @@ class SectionPage(SectionContent):
     files: Mapped[list[File]] = relationship(back_populates="pages", secondary="files_on_page")
     
     # TODO: Good for now. Gonna figure out later how to store page content there.
+    
+    
+    def __str__(self) -> str:
+        return f"{self.title}[{self.id}]"
 
 
 
@@ -189,7 +200,7 @@ class CourseUser(Base):
         server_default=text("CURRENT_TIMESTAMP")
     )
     
-    user: Mapped["User"] = relationship()
-    course: Mapped[Course] = relationship()
+    user: Mapped["User"] = relationship(viewonly=True, overlaps="courses,users")
+    course: Mapped[Course] = relationship(viewonly=True, overlaps="courses,users")
 
 

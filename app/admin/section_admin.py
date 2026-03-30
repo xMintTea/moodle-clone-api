@@ -1,4 +1,5 @@
 from sqladmin import ModelView
+from sqlalchemy.orm import joinedload
 
 from ..models.course import CourseSection
 

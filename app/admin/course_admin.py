@@ -10,3 +10,7 @@ class CourseAdmin(ModelView, model=Course):
         Course.secret,
         Course.creation_date
     ]
+    
+    form_excluded_columns = [
+        Course.creation_date
+    ]

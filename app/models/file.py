@@ -19,3 +19,7 @@ class File(Base):
     
     pages: Mapped[list["SectionPage"]] = relationship(back_populates="files", secondary="files_on_page")
     submittions: Mapped[list["SubmittedPage"]] = relationship(back_populates="files", secondary="files_on_submittion")
+    
+    
+    def __str__(self) -> str:
+        return self.file_name

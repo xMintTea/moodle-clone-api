@@ -1,7 +1,7 @@
 from sqladmin import ModelView
 
 from ..models.user import User
-
+from ..utils.password import hash_password
 
 class UserAdmin(ModelView, model=User):
     column_list = [

@@ -8,6 +8,7 @@ from ...database import get_db
 from ...models.user import User
 from ...schemas.user import UserResponse, UserCreate, UserUpdate
 
+
 router = APIRouter(prefix="/users", tags=["Users"])
 
 
@@ -31,15 +32,7 @@ def get_user(
     ) -> Optional[User]:
     return user_service.get_user(user_id)
 
-@router.post("/",
-    response_model=UserResponse,
-    status_code=status.HTTP_201_CREATED
-    )
-def create_user(
-    user_data: UserCreate,
-    user_service: UserService = Depends(get_user_service)
-    ) -> User:
-    return user_service.create_user(user_data)
+
 
 @router.put("/{user_id}",
     response_model=UserResponse

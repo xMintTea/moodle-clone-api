@@ -2,10 +2,13 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import NoResultFound
 from typing import Optional
+from pydantic import EmailStr
 
 from ..models.user import User
 from ..schemas.user import UserCreate, UserUpdate
+from ..schemas.auth import Login, Token
 from ..utils import password as pw_utils
+from ..utils import jwt_utils
 
 
 class UserService:
@@ -19,6 +22,10 @@ class UserService:
     
     def get_user(self, user_id: int) -> Optional[User]:
         return self._db.get(User, user_id)
+    
+    def get_user_by_email(self, user_email: EmailStr) -> Optional[User]:
+        stmt = select(User).filter(User.email == user_email)
+        return self._db.scalar(stmt)
     
     def create_user(self, user_schema: UserCreate) -> User:
         
@@ -61,3 +68,23 @@ class UserService:
             raise NoResultFound
         
         return user
+    
+    
+    
+    def login_user(self, email: EmailStr, password: str) -> Token:
+        user = self.get_user_by_email(email)
+        if not user:
+            raise NoResultFound #TODO: Не найдено -> Неверный логин/пароль
+        
+        matched_pw = pw_utils.validate_password(password, user.password)
+        
+        if not matched_pw:
+            raise NoResultFound #TODO: Неверный логин/пароль
+        
+        payload = jwt_utils.create_payload(user)
+        token = jwt_utils.encode_jwt(payload)
+        
+        return Token(
+            access_token=token,
+            token_type="Bearer"
+        )

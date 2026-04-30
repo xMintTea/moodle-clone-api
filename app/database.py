@@ -8,7 +8,7 @@ SQL_DB_URL = config.db_url
 
 engine = create_engine(SQL_DB_URL, connect_args={
     "check_same_thread" : False
-}, echo=True)
+}, echo=False)
 
 
 class Base(DeclarativeBase):

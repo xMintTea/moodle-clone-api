@@ -3,8 +3,6 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 
 from app.database import Base
-from app.models.user import User
-from app.models.course import Course, CourseSection, SectionContent, SectionPage
 
 
 SQL_DB_URL = "sqlite:///:memory:"

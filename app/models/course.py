@@ -174,7 +174,7 @@ class SubmittedPage(Base):
 class Test(SectionContent):
     __tablename__ = "tests"
     
-    deadline_date: Mapped[Optional[datetime]]
+    deadline_date: Mapped[Optional[datetime]] # TODO: REMOVE LATER
     
     section: Mapped[CourseSection] = relationship(back_populates="tests")
 

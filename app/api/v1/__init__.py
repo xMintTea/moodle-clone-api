@@ -6,9 +6,11 @@ from .sections import router as sections_router
 from .pages import router as pages_router
 from .tests import router as tests_router
 from .files import router as files_router
+from .auth import router as auth_router
 
 router = APIRouter(prefix="/v1")
 
+router.include_router(auth_router)
 router.include_router(users_router)
 router.include_router(courses_router)
 router.include_router(sections_router)

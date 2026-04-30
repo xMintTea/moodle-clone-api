@@ -11,6 +11,7 @@ class Config(BaseSettings):
     
     jwt_private_key_path: Path = Path(env2("JWT_PRIVATE_KEY_PATH")) #type: ignore
     jwt_public_key_path: Path = Path(env2("JWT_PUBLIC_KEY_PATH")) #type: ignore
+    jwt_algorithm: str = env2("JWT_ALG") # type: ignore
     
     db_url: str = env2("DATABASE_URL") #type: ignore
 

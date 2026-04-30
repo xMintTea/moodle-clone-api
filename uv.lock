@@ -49,6 +49,7 @@ dependencies = [
     { name = "cryptography" },
     { name = "dnspython" },
     { name = "email-validator" },
+    { name = "env2" },
     { name = "fastapi" },
     { name = "greenlet" },
     { name = "h11" },
@@ -98,6 +99,7 @@ requires-dist = [
     { name = "cryptography", specifier = "==46.0.5" },
     { name = "dnspython", specifier = "==2.8.0" },
     { name = "email-validator", specifier = "==2.3.0" },
+    { name = "env2", specifier = ">=0.0.0" },
     { name = "fastapi", specifier = "==0.133.1" },
     { name = "greenlet", specifier = "==3.3.2" },
     { name = "h11", specifier = "==0.16.0" },
@@ -362,6 +364,12 @@ sdist = { url = "https://files.pythonhosted.org/packages/f5/22/900cb125c76b7aaa4
 wheels = [
     { url = "https://files.pythonhosted.org/packages/de/15/545e2b6cf2e3be84bc1ed85613edd75b8aea69807a71c26f4ca6a9258e82/email_validator-2.3.0-py3-none-any.whl", hash = "sha256:80f13f623413e6b197ae73bb10bf4eb0908faf509ad8362c5edeb0be7fd450b4", size = 35604, upload-time = "2025-08-26T13:09:05.858Z" },
 ]
+
+[[package]]
+name = "env2"
+version = "0.0.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/96/22/63b196fbb1cb4dabf408797c550efd59d3c241a04b663052a3ad1c1d11e4/env2-0.0.0.tar.gz", hash = "sha256:34b54bf1636069cbb6266a278226d26d84d1ade736a4c36f4340664394a7ae2f", size = 2933, upload-time = "2017-11-10T20:41:58.856Z" }
 
 [[package]]
 name = "fastapi"

@@ -5,6 +5,7 @@ from datetime import datetime
 from typing import Optional
 from fastapi import UploadFile
 from fastapi.responses import StreamingResponse
+import urllib.parse
 
 from ..models.file import File
 
@@ -14,7 +15,7 @@ class FileService:
         self._db = session
     
     
-    def create_file(self, uploaded_file: UploadFile) -> File:
+    def create_file(self, uploaded_file: UploadFile, uploader_id: Optional[int] = None) -> File:
         
         bytes = uploaded_file.file.read()
 
@@ -23,7 +24,8 @@ class FileService:
             content_type=uploaded_file.content_type,
             headers=str(dict(uploaded_file.headers)),
             size=uploaded_file.size,
-            file_bytes=bytes
+            file_bytes=bytes,
+            uploader_id=uploader_id
         )
         
         self._db.add(file)
@@ -49,10 +51,10 @@ class FileService:
             for i in range(0, len(data), chunk_size):
                 yield data[i:i+chunk_size]
         
-        print(file.headers)
+        encoded_name = urllib.parse.quote(file.file_name, safe='')
         
         headers = {
-            "Content-Disposition": f"attachment; filename={file.file_name}"
+            "Content-Disposition": f"attachment; filename*=UTF-8''{encoded_name}"
         }
         
         return StreamingResponse(

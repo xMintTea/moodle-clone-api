@@ -1,91 +1,86 @@
-from fastapi import Depends, status, Query, Path
+from fastapi import Depends, status
 from fastapi.routing import APIRouter
-from typing import Optional, Annotated
-from sqlalchemy.orm import Session
+from typing import Optional
 
-from ...service.page_service import PageService
-from ...database import get_db
 from ...models.course import SectionPage, SubmittedPage
-from ...schemas.pages import PageCreate, PageUpdate, PageResponse
-from ...schemas.submission import PageSubmissionCreate, PageSubmissionResponse, PageSubmissionUpdate
+from ...schemas.pages import PageResponse
+from ...schemas.submission import PageSubmissionResponse
+from ...resources.pages import (
+    list_pages_dependency,
+    get_page_dependency,
+    create_page_dependency,
+    update_page_dependency,
+    delete_page_dependency,
+    get_page_submissions_dependency,
+    get_submission_dependency,
+    create_page_submittion_dependency,
+    add_file_to_the_page_dependency,
+    add_file_to_the_submission_dependency
+)
 
 
 router = APIRouter(prefix="/pages", tags=["Pages"])
 
-def get_page_service(session: Session = Depends(get_db)) -> PageService:
-    return PageService(session)
 
 @router.get("/", response_model=list[PageResponse])
 def list_pages(
-    skip: int = Query(0, ge=0),
-    limit: int = Query(100, ge=0, le=1000),
-    page_service: PageService = Depends(get_page_service)
+    assignments: list[SectionPage] = Depends(list_pages_dependency())
 ) -> list[SectionPage]:
-    return page_service.list_pages(skip=skip, limit=limit)
+    return assignments
 
 
 @router.get("/{page_id}", response_model=PageResponse)
 def get_page(
-    page_id: Annotated[int, Path(ge=1)],
-    page_service: PageService = Depends(get_page_service)
+    assignment: Optional[SectionPage] = Depends(get_page_dependency())
 ) -> Optional[SectionPage]:
-    return page_service.get_page(page_id)
+    return assignment
 
 
 @router.post("/", response_model=PageResponse, status_code=status.HTTP_201_CREATED)
 def create_page(
-    page_data: PageCreate,
-    page_service: PageService = Depends(get_page_service)
+    assignment: SectionPage = Depends(create_page_dependency())
 ) -> SectionPage:
-    return page_service.create_page(page_data)
+    return assignment
 
 
 @router.put("/{page_id}", response_model=PageResponse, status_code=status.HTTP_202_ACCEPTED)
 def update_page(
-    page_id: Annotated[int, Path(ge=1)],
-    page_data: PageUpdate,
-    page_service: PageService = Depends(get_page_service)
+    assignment: SectionPage = Depends(update_page_dependency())
 ) -> SectionPage:
-    return page_service.update_page(page_id, page_data)
+    return assignment
 
 
 @router.delete("/{page_id}",
     status_code=status.HTTP_204_NO_CONTENT
     )
 def delete_page(
-    page_id: Annotated[int, Path(ge=1)],
-    page_service: PageService = Depends(get_page_service)
+    _ = Depends(delete_page_dependency())
 ):
-    page_service.delete_page(page_id)
-
+    ...
 
 
 @router.get("/{page_id}/submittions/", response_model=list[PageSubmissionResponse])
 def get_page_submittions(
-    page_id: Annotated[int, Path(ge=1)],
-    user_id: Optional[int] = Query(None, ge=1),
-    page_service: PageService = Depends(get_page_service)
+    submissions: list[SubmittedPage] = Depends(get_page_submissions_dependency())
 ) -> list[SubmittedPage]:
-    return page_service.get_submittions(page_id, user_id)
+    return submissions
 
 
 @router.get("/submittions/{submittion_id}", response_model=PageSubmissionResponse)
 def get_submittion(
-    submittion_id: Annotated[int, Path(ge=1)],
-    page_service: PageService = Depends(get_page_service)
+    submission: Optional[SubmittedPage] = Depends(get_submission_dependency())
 ) -> Optional[SubmittedPage]:
-    return page_service.get_submittion(submittion_id)
+    return submission
+
 
 @router.post(
     "/{page_id}/submittions/",
     response_model=PageSubmissionResponse,
     status_code=status.HTTP_201_CREATED)
 def create_page_submittion(
-    page_id: Annotated[int, Path(ge=1)],
-    page_data: PageSubmissionCreate,
-    page_service: PageService = Depends(get_page_service)
-):
-    return page_service.create_submittion(page_id, page_data)
+    submission: SubmittedPage = Depends(create_page_submittion_dependency())
+) -> SubmittedPage:
+    return submission
 
 
 @router.put(
@@ -93,12 +88,9 @@ def create_page_submittion(
     response_model=PageSubmissionResponse,
     status_code=status.HTTP_202_ACCEPTED)
 def update_page_submission(
-    submittion_id: Annotated[int, Path(ge=1)],
-    submission_data: PageSubmissionUpdate,
-    page_service: PageService = Depends(get_page_service)
+    submission: SubmittedPage = Depends(update_page_dependency())
 ) -> SubmittedPage:
-    return page_service.update_submittion(submittion_id, submission_data)
-
+    return submission
 
 
 @router.put(
@@ -107,11 +99,10 @@ def update_page_submission(
     status_code=status.HTTP_202_ACCEPTED
 )
 def add_file_to_the_page(
-    page_id: Annotated[int, Path(ge=1)],
-    file_id: Annotated[int, Path(ge=1)],
-    page_service: PageService = Depends(get_page_service)
+    assignment: SectionPage = Depends(add_file_to_the_page_dependency())
 ) -> SectionPage:
-    return page_service.add_file_to_page(page_id, file_id)
+    return assignment
+
 
 @router.put(
     "/submittions/{submittion_id}/files/{file_id}",
@@ -119,10 +110,6 @@ def add_file_to_the_page(
     status_code=status.HTTP_202_ACCEPTED
 )
 def add_file_to_the_submittion(
-    submittion_id: Annotated[int, Path(ge=1)],
-    file_id: Annotated[int, Path(ge=1)],
-    page_service: PageService = Depends(get_page_service)
+    submission: SubmittedPage = Depends(add_file_to_the_submission_dependency())
 ) -> SubmittedPage:
-    return page_service.add_file_to_submittion(submittion_id, file_id)
-
-
+    return submission

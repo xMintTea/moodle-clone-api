@@ -1,78 +1,71 @@
 from fastapi import Depends, status, Query, Path
 from fastapi.routing import APIRouter
-from typing import Optional, Annotated
-from sqlalchemy.orm import Session
+from typing import Optional
 
-from ...service.section_service import SectionService
-from ...database import get_db
 from ...models.course import CourseSection, Test, SectionPage
-from ...schemas.sections import SectionCreate, SectionUpdate, SectionResponse
+from ...schemas.sections import SectionResponse
 from ...schemas.tests import TestResponse
 from ...schemas.pages import PageResponse
+from ...resources.sections import (
+    list_section_dependency,
+    get_section_dependency,
+    create_section_dependency,
+    update_section_dependency,
+    delete_section_dependency,
+    get_pages_in_section_dependency,
+    get_tests_in_section_dependency
+)
 
 
 router = APIRouter(prefix="/sections", tags=["Sections"])
 
-def get_section_service(session: Session = Depends(get_db)) -> SectionService:
-    return SectionService(session)
-
 
 @router.get("/", response_model=list[SectionResponse])
 def list_sections(
-    skip: int = Query(0, ge=0),
-    limit: int = Query(100, ge=0, le=1000),
-    section_service: SectionService = Depends(get_section_service)
+    sections: list[CourseSection] = Depends(list_section_dependency())
 ) -> list[CourseSection]:
-    return section_service.list_sections(skip, limit)
+    return sections
 
 
 @router.get("/{section_id}", response_model=SectionResponse)
 def get_section(
-    section_id: Annotated[int, Path(ge=1)],
-    section_service: SectionService = Depends(get_section_service)
+    section: Optional[CourseSection] = Depends(get_section_dependency())
 ) -> Optional[CourseSection]:
-    return section_service.get_section(section_id)
+    return section
 
 
 @router.post("/", response_model=SectionResponse)
 def create_section(
-    section_data: SectionCreate,
-    section_service: SectionService = Depends(get_section_service)
+    section: CourseSection = Depends(create_section_dependency())
 ) -> CourseSection:
-    return section_service.create_section(section_data)
+    return section
 
 
 @router.put("/{section_id}", response_model=SectionResponse)
 def update_section(
-    section_id: Annotated[int, Path(ge=1)],
-    section_data: SectionUpdate,
-    section_service: SectionService = Depends(get_section_service)
+    section: CourseSection = Depends(update_section_dependency())
 ) -> CourseSection:
-    return section_service.update_section(section_id, section_data)
+    return section
 
 
 @router.delete("/{section_id}",
     status_code=status.HTTP_204_NO_CONTENT
     )
 def delete_section(
-    section_id: Annotated[int, Path(ge=1)],
-    section_service: SectionService = Depends(get_section_service)
+    _ = Depends(delete_section_dependency())
 ):
-    section_service.delete_section(section_id)
-    
-    
+    ...
+
+
 @router.get("/{section_id}/pages/", response_model=list[PageResponse])
 def get_pages_in_section(
-    section_id: Annotated[int, Path(ge=1)],
-    section_service: SectionService = Depends(get_section_service)
+    assignments_in_section: list[SectionPage] = Depends(get_pages_in_section_dependency())
 ) -> list[SectionPage]:
-    return section_service.get_pages(section_id)
+    return assignments_in_section
 
 
 @router.get("/{section_id}/tests/", response_model=list[TestResponse])
 def get_tests_in_section(
-    section_id: Annotated[int, Path(ge=1)],
-    section_service: SectionService = Depends(get_section_service)
+    tests_in_section: list[Test] = Depends(get_tests_in_section_dependency())
 ) -> list[Test]:
-    return section_service.get_tests(section_id)
-
+    return tests_in_section

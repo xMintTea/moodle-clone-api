@@ -1,73 +1,66 @@
 from fastapi import Depends, status, Query
 from fastapi.routing import APIRouter
 from typing import Optional
-from sqlalchemy.orm import Session
 
-from ...service.course_service import CourseService
-from ...service.course_user_service import CourseUserService
-from ...database import get_db
 from ...models.course import Course, CourseUser
-from ...schemas.course import CourseCreate, CourseUpdate, CourseResponce
-from ...schemas.course_user import CreateCourseUser, UpdateCourseUser, CourseUserResponse
+from ...schemas.course import CourseResponce
+from ...schemas.course_user import CourseUserResponse
+from ...resources.courses import(
+    get_course_list_dependency,
+    get_course_dependency,
+    create_course_dependency,
+    update_course_dependency,
+    delete_course_dependency,
+    get_course_users_dependency,
+    add_user_to_the_course_dependency,
+    update_user_on_the_course_dependency,
+    delete_user_from_the_course_dependency
+    )
 
 router = APIRouter(prefix="/courses", tags=["Courses"])
 
 
-def get_course_service(session: Session = Depends(get_db)) -> CourseService:
-    return CourseService(session)
-
-
-def get_course_user_service(session: Session = Depends(get_db)) -> CourseUserService:
-    return CourseUserService(session)
 
 
 @router.get("/", response_model=list[CourseResponce])
 async def list_courses(
-    skip: int = Query(0, ge=0),
-    limit: int = Query(100, ge=1, le=1000),
-    course_service: CourseService = Depends(get_course_service)
+    course_list: list[Course] = Depends(get_course_list_dependency())
 ) -> list[Course]:
-    return course_service.list_courses(skip, limit)
+    return course_list
 
 
 @router.get("/{course_id}", response_model=CourseResponce)
 def get_course(
-    course_id: int,
-    course_service: CourseService = Depends(get_course_service)
+    course: Optional[Course] = Depends(get_course_dependency())
 ) -> Optional[Course]:
-    return course_service.get_course(course_id)
+    return course
 
 @router.post("/", response_model=CourseResponce, status_code=status.HTTP_201_CREATED)
 def create_course(
-    course_data: CourseCreate,
-    course_service: CourseService = Depends(get_course_service)
+    course: Course = Depends(create_course_dependency())
 ) -> Course:
-    return course_service.create_course(course_data)
+    return course
 
 @router.put("/{course_id}",response_model=CourseResponce)
 def update_course(
-    course_id: int,
-    course_data: CourseUpdate,
-    course_service: CourseService = Depends(get_course_service)
+    course: Course = Depends(update_course_dependency())
 ) -> Course:
-    return course_service.update_course(course_id, course_data)
+    return course
 
 @router.delete("/{course_id}",
     status_code=status.HTTP_204_NO_CONTENT
     )
 def delete_course(
-    course_id: int,
-    course_service: CourseService = Depends(get_course_service)
+    _ = Depends(delete_course_dependency())
 ):
-    course_service.delete_course(course_id)
+    ...
 
 
 @router.get("/{course_id}/members/", response_model=list[CourseUserResponse])
 def get_course_users(
-    course_id: int,
-    course_user_service: CourseUserService = Depends(get_course_user_service)   
+    course_users: list[CourseUser] = Depends(get_course_users_dependency())
 ) -> list[CourseUser]:
-    return course_user_service.list_records_in_course(course_id)
+    return course_users
 
 
 @router.post(
@@ -75,11 +68,9 @@ def get_course_users(
     response_model=CourseUserResponse,
     status_code=status.HTTP_202_ACCEPTED)
 def add_user_to_the_course(
-    course_id: int,
-    courseuser_data: CreateCourseUser,
-    course_user_service: CourseUserService = Depends(get_course_user_service)   
+    course_user: CourseUser = Depends(add_user_to_the_course_dependency())
 ) -> CourseUser:
-    return course_user_service.add_record(course_id, courseuser_data)
+    return course_user
     
 
 @router.put(
@@ -87,29 +78,13 @@ def add_user_to_the_course(
     response_model=CourseUserResponse,
     status_code=status.HTTP_202_ACCEPTED)
 def update_user_on_the_course(
-    course_id: int,
-    user_id: int,
-    courseuser_data: UpdateCourseUser,
-    course_service: CourseService = Depends(get_course_service)   
+    course: Course = Depends(update_user_on_the_course_dependency())
 ) -> Course:
-    ...
-    
+    return course
+
+
 @router.delete("/{course_id}/members/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_user_from_the_course(
-    course_id: int,
-    user_id: int,
-    course_service: CourseService = Depends(get_course_service)   
-):
-    ...
-    
-@router.get("/{course_id}/admins")
-def get_course_admins(
-    course_id: int
-):
-    ...
-    
-@router.get("/{course_id}/teacher")
-def get_course_teachers(
-    course_id: int
+    _ = Depends(delete_user_from_the_course_dependency())
 ):
     ...

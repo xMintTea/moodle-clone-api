@@ -1,5 +1,6 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 
+from ...security.authorization import bearer_scheme
 from .users import router as users_router
 from .courses import router as courses_router
 from .sections import router as sections_router
@@ -8,7 +9,7 @@ from .tests import router as tests_router
 from .files import router as files_router
 from .auth import router as auth_router
 
-router = APIRouter(prefix="/v1")
+router = APIRouter(prefix="/v1",  dependencies=[Depends(bearer_scheme)])
 
 router.include_router(auth_router)
 router.include_router(users_router)

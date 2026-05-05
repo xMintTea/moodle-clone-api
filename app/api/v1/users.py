@@ -1,48 +1,42 @@
 from fastapi import Depends, status, Query, Path
 from fastapi.routing import APIRouter
-from typing import Optional, Annotated
-from sqlalchemy.orm import Session
+from typing import Optional
 
-from ...service.user_service import UserService
-from ...database import get_db
 from ...models.user import User
-from ...schemas.user import UserResponse, UserCreate, UserUpdate
+from ...schemas.user import UserResponse
+from ...resources.users import (
+    get_users_dependency,
+    get_user_dependency,
+    update_user_dependency,
+    delete_user_dependency
+)
 
 
 router = APIRouter(prefix="/users", tags=["Users"])
 
 
-def get_user_service(session: Session = Depends(get_db)) -> UserService:
-    return UserService(session)
-
 
 @router.get("/", response_model=list[UserResponse])
 def get_users(
-    skip: int = Query(0, ge=0),
-    limit: int = Query(100, ge=1, le=1000),
-    user_service: UserService = Depends(get_user_service)
+    users: list[User] = Depends(get_users_dependency())
     ) -> list[User]:
-    return user_service.list_users(skip,limit)
+    return users
 
 
 @router.get("/{user_id}", response_model=UserResponse)
 def get_user(
-    user_id: Annotated[int, Path(ge=1)],
-    user_service: UserService = Depends(get_user_service)
+    user: Optional[User] = Depends(get_user_dependency())
     ) -> Optional[User]:
-    return user_service.get_user(user_id)
-
+    return user
 
 
 @router.put("/{user_id}",
     response_model=UserResponse
     )
 def update_user(
-    user_id: Annotated[int, Path(ge=1)],
-    user_data: UserUpdate,
-    user_service: UserService = Depends(get_user_service)
+    user: User = Depends(update_user_dependency())
     ) -> User:
-    return user_service.update_user(user_id, user_data)
+    return user
 
 
 @router.delete(
@@ -50,7 +44,6 @@ def update_user(
     status_code=status.HTTP_204_NO_CONTENT,
     )
 def delete_user(
-    user_id: Annotated[int, Path(ge=1)],
-    user_service: UserService = Depends(get_user_service)
+    _ = Depends(delete_user_dependency())
 ):
-    user_service.delete_user(user_id)
+    ...

@@ -1,58 +1,53 @@
 from fastapi import Depends, status, Query, Path
 from fastapi.routing import APIRouter
-from typing import Optional, Annotated
-from sqlalchemy.orm import Session
+from typing import Optional
 
-from ...service.test_service import TestService
-from ...database import get_db
 from ...models.course import Test
-from ...schemas.tests import TestCreate, TestUpdate, TestResponse
+from ...schemas.tests import TestResponse
+from ...resources.tests import (
+    list_tests_dependency,
+    get_test_dependency,
+    create_test_dependency,
+    update_test_dependency,
+    delete_test_dependency
+)
 
 
 router = APIRouter(prefix="/tests", tags=["Tests"])
 
 
-def get_test_service(session: Session = Depends(get_db)) -> TestService:
-    return TestService(session)
-
-
 @router.get("/", response_model=list[TestResponse])
 def list_tests(
-    skip: int = Query(0, ge=0),
-    limit: int = Query(100, ge=1, le=1000),
-    test_service: TestService = Depends(get_test_service)
+    tests: list[Test]= Depends(list_tests_dependency())
 ) -> list[Test]:
-    return test_service.list_tests(skip=skip, limit=limit)
+    return tests
 
 
 @router.get("/{test_id}", response_model=TestResponse)
 def get_test(
-    test_id: Annotated[int, Path(ge=1)],
-    test_service: TestService = Depends(get_test_service)
+    test: Optional[Test] = Depends(get_test_dependency())
 ) -> Optional[Test]:
-    return test_service.get_test(test_id)
+    return test
+
 
 @router.post("/", response_model=TestResponse, status_code=status.HTTP_201_CREATED)
 def create_test(
-    test_data: TestCreate,
-    test_service: TestService = Depends(get_test_service)
+    test: Test = Depends(create_test_dependency())
 ) -> Test:
-    return test_service.create_test(test_data)
+    return test
+
 
 @router.put("/{test_id}", response_model=TestResponse, status_code=status.HTTP_202_ACCEPTED)
 def update_test(
-    test_id: Annotated[int, Path(ge=1)],
-    test_data: TestUpdate,
-    test_service: TestService = Depends(get_test_service)
+    test: Test = Depends(update_test_dependency())
 ) -> Test:
-    return test_service.update_test(test_id, test_data)
+    return test
 
 
 @router.delete("/{test_id}",
     status_code=status.HTTP_204_NO_CONTENT
     )
 def delete_test(
-    test_id: Annotated[int, Path(ge=1)],
-    test_service: TestService = Depends(get_test_service)
+    _ = Depends(delete_test_dependency())
 ):
-    test_service.delete_test(test_id)
+    ...

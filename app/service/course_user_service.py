@@ -24,6 +24,11 @@ class CourseUserService:
     def list_records_in_course(self, course_id: int) -> list[CourseUser]:
         stmt = select(CourseUser).filter(CourseUser.course_id == course_id)
         return list(self._db.scalars(stmt).all())
+    
+    
+    def find_record(self, course_id: int, user_id: int) -> Optional[CourseUser]:
+        stmt = select(CourseUser).filter(CourseUser.course_id == course_id, CourseUser.user_id == user_id)
+        return self._db.scalar(stmt)
 
     def list_students_in_course(self, course_id: int) -> list[User]:
         return self._list_users_by_role_id(course_id, UserType.DEFAULT)

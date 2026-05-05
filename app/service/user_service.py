@@ -81,10 +81,24 @@ class UserService:
         if not matched_pw:
             raise NoResultFound #TODO: Неверный логин/пароль
         
-        payload = jwt_utils.create_payload(user)
-        token = jwt_utils.encode_jwt(payload)
+
+        access_token = jwt_utils.create_access_token(user)
+        refresh_token = jwt_utils.create_refresh_token(user)
         
         return Token(
-            access_token=token,
-            token_type="Bearer"
+            access_token=access_token,
+            refresh_token=refresh_token
         )
+        
+        
+    def refresh_user_token(self, payload: dict) -> Token:
+        email: EmailStr = payload.get("sub")  #type: ignore
+        
+        user = self.get_user_by_email(email)
+        
+        if user is None:
+            raise NoResultFound
+        
+        fresh_access_token = jwt_utils.create_access_token(user)
+        
+        return Token(access_token=fresh_access_token)

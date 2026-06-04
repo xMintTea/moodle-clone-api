@@ -1,5 +1,6 @@
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from fastapi import Depends, Security, status
+from fastapi import Depends, Security, status, Form, Response, Request, Cookie
+from fastapi.exceptions import HTTPException
 from sqlalchemy.orm import Session
 from pydantic import EmailStr
 from fastapi.exceptions import HTTPException
@@ -59,13 +60,61 @@ def get_verified_user(
     return user
 
 
+def login_user_dependency():
+    def dependency(
+        response: Response,
+        username: EmailStr = Form(),
+        password: str = Form(),
+        user_service: UserService = Depends(get_user_service)
+    ):
+        
+        tokens = user_service.login_user(username, password)
+        
+        if tokens.refresh_token is None:
+            return
+
+        response.set_cookie(
+            key="refresh_token",
+            value=tokens.refresh_token,
+            httponly=True,
+            secure=False,
+            samesite="lax",
+            path="/",
+            max_age=10*60*24
+        )
+        
+        return tokens
+    return dependency
+
+
 def refresh_access_token_dependency():
     def dependency(
-        payload: dict = Depends(get_payload),
+        response: Response,
+        refresh_token = Cookie(None),
         user_service: UserService = Depends(get_user_service)
     ) -> Token:
+        
+        if refresh_token is None:
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
+        
+        payload = get_payload(refresh_token)
         validate_token_type(payload, REFRESH_TOKEN_TYPE)
         
-        return user_service.refresh_user_token(payload)
+        new_tokens = user_service.refresh_user_token(payload)
+        
+        
+        
+        response.set_cookie(
+            key="refresh_token",
+            value=refresh_token,
+            httponly=True,
+            secure=False,
+            samesite="lax",
+            path="/",
+            max_age=10*60*24
+        )
+        
+        
+        return new_tokens
         
     return dependency

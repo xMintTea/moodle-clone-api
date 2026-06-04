@@ -8,7 +8,7 @@ from ...schemas.auth import Token
 from ...database import get_db
 from ...schemas.user import UserResponse, UserCreate
 from ...models.user import User
-from ...security.authorization import refresh_access_token_dependency
+from ...security.authorization import refresh_access_token_dependency, login_user_dependency
 
 router = APIRouter(prefix="/auth", tags=["Auth"])
 
@@ -36,11 +36,9 @@ def create_user(
     response_model_exclude_none=True
     )
 def login(
-    username: EmailStr = Form(),
-    password: str = Form(),
-    user_service: UserService = Depends(get_user_service)
+    token = Depends(login_user_dependency())
 ) -> Token:
-    return user_service.login_user(username, password)
+    return token
 
 
 @router.post("/refresh", response_model=Token, response_model_exclude_none=True)

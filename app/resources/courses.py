@@ -181,8 +181,8 @@ def get_course_users_dependency():
 def add_user_to_the_course_dependency():
     def dependency(
         course_id: Annotated[int, Path(..., ge=1)],
-        secret: Annotated[Optional[str], Query()],
         courseuser_data: CreateCourseUser,
+        secret: Optional[str] = Query(default=None),
         course_service: CourseService = Depends(get_course_service),
         course_user_service: CourseUserService = Depends(get_course_user_service),
         user: User = Depends(get_verified_user)

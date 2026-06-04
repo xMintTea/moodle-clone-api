@@ -1,6 +1,7 @@
 from fastapi import FastAPI, Request, status
 from fastapi.responses import JSONResponse
 from sqlalchemy.exc import NoResultFound, IntegrityError
+from jwt import ExpiredSignatureError
 
 def register_exception_handlers(app: FastAPI) -> None:
     
@@ -9,6 +10,14 @@ def register_exception_handlers(app: FastAPI) -> None:
         return JSONResponse(
             status_code=status.HTTP_404_NOT_FOUND,
             content={"detail" : "Requested resource not found"}
+        )
+        
+        
+    @app.exception_handler(ExpiredSignatureError)
+    def expired_token(request: Request, exc: NoResultFound):
+        return JSONResponse(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            content={"detail" : "Invalid token"}
         )
     
     

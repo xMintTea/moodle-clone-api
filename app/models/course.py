@@ -1,4 +1,4 @@
-from sqlalchemy import String,Text, ForeignKey, DateTime, text, Enum, and_
+from sqlalchemy import String,Text, ForeignKey, DateTime, text, Enum, and_, Boolean, Integer
 from sqlalchemy.orm import Mapped, mapped_column, relationship, declared_attr
 from typing import Optional, List
 from datetime import datetime
@@ -6,7 +6,14 @@ from datetime import datetime
 from ..database import Base
 from ..models.user import User
 from ..models.file import File
-from ..models.context.enums import CourseAccessLevel, CourseAccessStatus, Visibility
+from ..models.context.enums import (
+     CourseAccessLevel,
+     CourseAccessStatus,
+     Visibility,
+     QuestionTypes,
+     ReviewModes,
+     ReviewType
+    )
 
 
 
@@ -127,8 +134,6 @@ class SectionPage(SectionContent):
     
     files: Mapped[list[File]] = relationship(back_populates="pages", secondary="files_on_page")
     
-    # TODO: Good for now. Gonna figure out later how to store page content there.
-    
     
     def __str__(self) -> str:
         return f"{self.title}[{self.id}]"
@@ -174,9 +179,51 @@ class SubmittedPage(Base):
 class Test(SectionContent):
     __tablename__ = "tests"
     
-    deadline_date: Mapped[Optional[datetime]] # TODO: REMOVE LATER
-    
     section: Mapped[CourseSection] = relationship(back_populates="tests")
+
+
+class TestQuestion(Base):
+    __tablename__ = "questions"
+    
+    test_id: Mapped[int] = mapped_column(ForeignKey("tests.id"))
+    order: Mapped[int]
+    description: Mapped[str] = mapped_column(Text)
+    question_type: Mapped[QuestionTypes] = mapped_column(Enum(QuestionTypes))
+    review_mode: Mapped[ReviewModes] = mapped_column(Enum(ReviewModes), default=ReviewModes.AUTO)
+    review_type: Mapped[ReviewType] = mapped_column(Enum(ReviewType), default=ReviewType.EXACT) #for auto review only else ignored
+    score_percent: Mapped[Integer] = mapped_column(Integer, min=0, max=100, default=100) # for SCORED review type only else ignored
+    correct_answer_text: Mapped[Optional[str]] = mapped_column(Text, nullable=True) # for WRITE ANSWER question type only else ignored
+
+    options: Mapped[list["QuestionOption"]] = relationship(
+        back_populates="questions",
+        cascade="all, delete-orphan")
+
+
+class QuestionOption(Base):
+    __tablename__ = "options"
+    question_id: Mapped[int] = mapped_column(ForeignKey("questions.id"))
+    text: Mapped[str] = mapped_column(Text)
+    is_correct: Mapped[Boolean] = mapped_column(Boolean, default=False)
+
+    question: Mapped[TestQuestion] = relationship(back_populates="options")
+    answers: Mapped["QuestionAnswer"] = relationship(
+        back_populates=
+    )
+
+    
+
+class QuestionAnswer(Base):
+    __tablename__ = "question_answers"
+    
+    question_id: Mapped[int] = mapped_column(ForeignKey("questions.id"))
+    text_answer: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    json: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    
+
+class AnswerOptions(Base):
+    answer_id: Mapped[int] = mapped_column(ForeignKey("question_answers.id"))
+    option_id: Mapped[int] = mapped_column(ForeignKey("options.id"))
+    
 
 
 class TestResult(Base):

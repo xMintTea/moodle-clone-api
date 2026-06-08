@@ -32,14 +32,14 @@ class QuestionTypes(StrEnum):
     SELECT_ONE = "select_one"
     SELECT_MULTIPLE = "select_multiple"
     WRITE_ANSWER = "write_answer"
-    ORDER_ANSWERS = "order_answers"
+    MATCH = "match_answers"
     
     
 class ReviewModes(StrEnum):
     AUTO = "auto"
     MANUAL = "manual"
     
-class ReviewType(StrEnum):
+class ScoringType(StrEnum):
     EXACT = "exact"   # exact match
     SUBSET = "subset" # answer must be a subset of right answers
     SCORED = "scored" # correct +1; incorrect -1; max(0, score)

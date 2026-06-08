@@ -1,4 +1,4 @@
-from sqlalchemy import String,Text, ForeignKey, DateTime, text, Enum, and_, Boolean, Integer
+from sqlalchemy import String,Text, ForeignKey, DateTime, text, Enum, and_, JSON
 from sqlalchemy.orm import Mapped, mapped_column, relationship, declared_attr
 from typing import Optional, List
 from datetime import datetime
@@ -11,8 +11,7 @@ from ..models.context.enums import (
      CourseAccessStatus,
      Visibility,
      QuestionTypes,
-     ReviewModes,
-     ReviewType
+     ReviewModes
     )
 
 
@@ -33,7 +32,7 @@ class SectionContent(Base):
     order: Mapped[int]
     visibility: Mapped[Visibility] = mapped_column(Enum(Visibility), default=Visibility.VISIBLE_TO_CREATOR)
 
-    max_points: Mapped[int] = mapped_column(default=0)
+
 
     section_id: Mapped[int] = mapped_column(ForeignKey("course_sections.id", ondelete="CASCADE"))
    
@@ -102,6 +101,7 @@ class CourseSection(Base):
     
     title: Mapped[str] = mapped_column(String(256))
     description: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    max_points: Mapped[int] = mapped_column(default=0)
     
     order: Mapped[int]
     visibility: Mapped[Visibility] = mapped_column(Enum(Visibility), default=Visibility.VISIBLE_TO_CREATOR)
@@ -179,62 +179,23 @@ class SubmittedPage(Base):
 class Test(SectionContent):
     __tablename__ = "tests"
     
+    content: Mapped[Optional[str]] = mapped_column(JSON, nullable=True)
+    max_attempts: Mapped[Optional[int]]
+    
     section: Mapped[CourseSection] = relationship(back_populates="tests")
 
 
-class TestQuestion(Base):
-    __tablename__ = "questions"
-    
-    test_id: Mapped[int] = mapped_column(ForeignKey("tests.id"))
-    order: Mapped[int]
-    description: Mapped[str] = mapped_column(Text)
-    question_type: Mapped[QuestionTypes] = mapped_column(Enum(QuestionTypes))
-    review_mode: Mapped[ReviewModes] = mapped_column(Enum(ReviewModes), default=ReviewModes.AUTO)
-    review_type: Mapped[ReviewType] = mapped_column(Enum(ReviewType), default=ReviewType.EXACT) #for auto review only else ignored
-    score_percent: Mapped[Integer] = mapped_column(Integer, min=0, max=100, default=100) # for SCORED review type only else ignored
-    correct_answer_text: Mapped[Optional[str]] = mapped_column(Text, nullable=True) # for WRITE ANSWER question type only else ignored
 
-    options: Mapped[list["QuestionOption"]] = relationship(
-        back_populates="questions",
-        cascade="all, delete-orphan")
-
-
-class QuestionOption(Base):
-    __tablename__ = "options"
-    question_id: Mapped[int] = mapped_column(ForeignKey("questions.id"))
-    text: Mapped[str] = mapped_column(Text)
-    is_correct: Mapped[Boolean] = mapped_column(Boolean, default=False)
-
-    question: Mapped[TestQuestion] = relationship(back_populates="options")
-    answers: Mapped["QuestionAnswer"] = relationship(
-        back_populates=
-    )
-
-    
-
-class QuestionAnswer(Base):
-    __tablename__ = "question_answers"
-    
-    question_id: Mapped[int] = mapped_column(ForeignKey("questions.id"))
-    text_answer: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
-    json: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
-    
-
-class AnswerOptions(Base):
-    answer_id: Mapped[int] = mapped_column(ForeignKey("question_answers.id"))
-    option_id: Mapped[int] = mapped_column(ForeignKey("options.id"))
-    
-
-
-class TestResult(Base):
-    __tablename__ = "test_results"
+class UserAttemps(Base):
+    __tablename__ = "user_attempts"
     
     test_id: Mapped[int] = mapped_column(ForeignKey("tests.id"))
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
     start_time: Mapped[datetime]
     end_time: Mapped[datetime]
-    answers: Mapped[str] = mapped_column(Text)
-
+    answers: Mapped[str] = mapped_column(JSON) 
+    
+    
 class CourseUser(Base):
     __tablename__ = "course_users"
     

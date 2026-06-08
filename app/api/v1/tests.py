@@ -4,12 +4,15 @@ from typing import Optional
 
 from ...models.course import Test
 from ...schemas.tests import TestResponse
+from ...schemas.test_answers import AnswerBase
+from ...schemas.questions import Question
 from ...resources.tests import (
     list_tests_dependency,
     get_test_dependency,
     create_test_dependency,
     update_test_dependency,
-    delete_test_dependency
+    delete_test_dependency,
+    get_attempts_dependency
 )
 
 
@@ -51,3 +54,9 @@ def delete_test(
     _ = Depends(delete_test_dependency())
 ):
     ...
+
+@router.get("/{test_id}/attempts", response_model=list[AnswerBase])
+def get_attempts(
+    attemps = Depends(get_attempts_dependency())
+):
+    return attemps

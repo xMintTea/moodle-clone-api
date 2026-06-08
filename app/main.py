@@ -14,6 +14,11 @@ register_exception_handlers(app)
 
 app.include_router(routerV1)
 
+
+@app.get("/")
+def main():
+    return "Server running"
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://127.0.0.1:3000"],

@@ -3,14 +3,18 @@ from typing import Annotated, Optional
 from datetime import datetime
 
 from ..utils.schemas_utils import optional
+from .questions import Question
+from ..models.context.enums import Visibility
 
-
-# -------- Test --------
 
 class TestBase(BaseModel):
-    deadline_date: Annotated[Optional[datetime], Field()] = None
+    title: Annotated[str, Field(...)]
+    description: Annotated[Optional[str], Field()]
+    due_date: Annotated[Optional[datetime], Field()] = None
     order: Annotated[int, Field(..., ge=0)]
-    visibility_id: Annotated[int, Field(..., ge=1)]
+    visibility: Annotated[Visibility, Field(default=Visibility.VISIBLE_EVERYONE)]
+    content: Annotated[Optional[list[Question]], Field(default=None)]
+    max_attempts: Annotated[Optional[int], Field()]
 
 
 class TestCreate(TestBase):

@@ -3,6 +3,8 @@ from fastapi.exceptions import HTTPException
 from fastapi.routing import APIRouter
 from typing import Optional, Annotated
 from sqlalchemy.orm import Session
+import json
+import copy
 
 from ..service.test_service import TestService
 from ..database import get_db
@@ -55,6 +57,38 @@ def get_test_dependency():
         is_admin = user.user_type == UserType.ADMIN
         can_see = test.visibility == Visibility.VISIBLE_EVERYONE
         have_power = user in test.section.course.users and user not in test.section.course.students
+        
+        if can_see and not have_power:
+            raw_content = test.content
+
+            if raw_content is None:
+                return test
+            
+
+            if isinstance(raw_content, str):
+                content_list = json.loads(raw_content)
+                was_string = True
+            else:
+                content_list = raw_content
+                was_string = False
+                
+                
+            for q in content_list:
+                if q.get("type") == "write_answer":
+                    q["answer"] = ""
+                elif "answers" in q:
+                    q["answers"] = [""] if isinstance(q["answers"], list) else {"":""}
+                    
+                    
+            if was_string:
+                test.content = json.dumps(content_list, indent=2, ensure_ascii=False)
+            else:
+                test.content = content_list
+
+            return test
+            
+            
+            
         
         if is_admin or can_see or have_power:
             return test
@@ -133,5 +167,23 @@ def delete_test_dependency():
             
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
         
+        
+    return dependency
+
+
+def get_attempts_dependency():
+    def dependency(
+        test_id: Annotated[int, Path(ge=1)],
+        user_id: int = Query(None, ge=1),
+        test_service: TestService = Depends(get_test_service),
+        user: User = Depends(get_verified_user)
+        ):
+        
+        can_access = user.user_type != UserType.DEFAULT or user.id == user_id
+        
+        if can_access:
+            return test_service.get_attempts(test_id, user_id)
+        
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
         
     return dependency

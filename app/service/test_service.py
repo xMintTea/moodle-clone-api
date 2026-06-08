@@ -4,7 +4,7 @@ from sqlalchemy.exc import NoResultFound
 from datetime import datetime
 from typing import Optional
 
-from ..models.course import Test
+from ..models.course import Test, UserAttemps
 from ..schemas.tests import TestCreate, TestUpdate
 
 class TestService:
@@ -52,6 +52,15 @@ class TestService:
         
         self._db.delete(test)
         self._db.commit()
+        
+    
+    def get_attempts(self, test_id: int, user_id: Optional[int] = None) -> list[UserAttemps]:
+        stmt = select(UserAttemps).filter(UserAttemps.test_id == test_id)
+        
+        if user_id is not None:
+            stmt.filter(UserAttemps.user_id == user_id)
+        
+        return list(self._db.scalars(stmt).all())
     
     def _get_test_or_raise(self, test_id: int) -> Test:
         test = self.get_test(test_id)

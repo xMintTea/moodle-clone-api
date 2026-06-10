@@ -58,7 +58,8 @@ def create_access_token(user: User) -> str:
         "first_name" : user.first_name,
         "last_name" : user.last_name,
         "email" : user.email,
-        "role" : user.user_type
+        "role" : user.user_type,
+        "id": user.id
     }
     
     return create_jwt(

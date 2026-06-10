@@ -4,7 +4,7 @@ from typing import Optional
 
 from ...models.course import Test
 from ...schemas.tests import TestResponse
-from ...schemas.test_answers import AnswerBase
+from ...schemas.test_answers import AnswerBase, AnswerResponse
 from ...schemas.questions import Question
 from ...resources.tests import (
     list_tests_dependency,
@@ -12,7 +12,8 @@ from ...resources.tests import (
     create_test_dependency,
     update_test_dependency,
     delete_test_dependency,
-    get_attempts_dependency
+    get_attempts_dependency,
+    create_attempt_dependency
 )
 
 
@@ -55,8 +56,15 @@ def delete_test(
 ):
     ...
 
-@router.get("/{test_id}/attempts", response_model=list[AnswerBase])
+@router.get("/{test_id}/attempts", response_model=list[AnswerResponse])
 def get_attempts(
     attemps = Depends(get_attempts_dependency())
 ):
     return attemps
+
+
+@router.post("/{test_id}/attempts")
+def create_attempt(
+    attemps = Depends(create_attempt_dependency())
+):
+    ...

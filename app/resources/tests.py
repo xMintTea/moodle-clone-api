@@ -4,7 +4,6 @@ from fastapi.routing import APIRouter
 from typing import Optional, Annotated
 from sqlalchemy.orm import Session
 import json
-import copy
 
 from ..service.test_service import TestService
 from ..database import get_db
@@ -12,6 +11,7 @@ from ..models.course import Test
 from ..models.user import User
 from ..models.context.enums import UserType, Visibility
 from ..schemas.tests import TestCreate, TestUpdate, TestResponse
+from ..schemas.test_answers import AnswerCreate
 from ..security.authorization import get_verified_user
 from .sections import SectionService, get_section_service
 
@@ -186,4 +186,17 @@ def get_attempts_dependency():
         
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
         
+    return dependency
+
+
+def create_attempt_dependency():
+    def dependency(
+        test_id: Annotated[int, Path(ge=1)],
+        attempt_data: AnswerCreate,
+        test_service: TestService = Depends(get_test_service),
+        user: User = Depends(get_verified_user)
+    ):
+        same_user = user.id == attempt_data.user_id
+        test_service.create_attempt(test_id, attempt_data)
+    
     return dependency

@@ -39,7 +39,6 @@ Answers = Annotated[
 ]
 
 class AnswerBase(BaseModel):
-    test_id: Annotated[int, Field(..., ge=1)]
     user_id: Annotated[int, Field(..., ge=1)]
     start_time: Annotated[datetime, Field(...)]
     end_time: Annotated[datetime, Field(...)]
@@ -51,8 +50,12 @@ class AnswerCreate(AnswerBase):
 
 @optional
 class AnswerUpdate(AnswerCreate):
-    ...
+    score: Annotated[Optional[int], Field(default=None)]
     
 
 class AnswerResponse(AnswerBase):
+    test_id: Annotated[int, Field(..., ge=1)]
+    score: Annotated[Optional[int], Field(default=None)]
+    max_score: Annotated[Optional[int], Field(default=None)]
+    
     model_config = ConfigDict(from_attributes=True)

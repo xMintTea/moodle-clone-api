@@ -16,7 +16,6 @@ class PageBase(BaseModel):
     order: Annotated[int, Field(..., ge=0)]
     visibility: Annotated[Visibility, Field(default=Visibility.VISIBLE_TO_CREATOR)]
     due_date: Annotated[Optional[datetime], Field()]
-    max_points: Annotated[int, Field()]
 
 
 

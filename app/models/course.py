@@ -130,7 +130,7 @@ class SectionPage(SectionContent):
     comment: Mapped[Optional[str]] = mapped_column(Text)
     
     section: Mapped[CourseSection] = relationship(back_populates="pages")
-    submitted_pages: Mapped[list["SubmittedPage"]] = relationship(back_populates="page") 
+    submitted_pages: Mapped[list["SubmittedPage"]] = relationship(back_populates="page")
     
     files: Mapped[list[File]] = relationship(back_populates="pages", secondary="files_on_page")
     
@@ -193,7 +193,9 @@ class UserAttemps(Base):
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
     start_time: Mapped[datetime]
     end_time: Mapped[datetime]
-    answers: Mapped[str] = mapped_column(JSON) 
+    answers: Mapped[str] = mapped_column(JSON)
+    score: Mapped[Optional[int]]
+    max_score: Mapped[int]
     
     
 class CourseUser(Base):

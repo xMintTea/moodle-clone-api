@@ -4,7 +4,7 @@ from sqlalchemy.exc import NoResultFound
 from datetime import datetime
 from typing import Optional
 
-from ..models.course import Test, UserAttemps
+from ..models.course import Test, UserAttemps, Course
 from ..schemas.tests import TestCreate, TestUpdate
 from ..schemas.test_answers import AnswerCreate
 
@@ -65,7 +65,7 @@ class TestService:
     
     
     
-    def create_attempt(self, test_id: int, attempt_data: AnswerCreate):
+    def create_attempt(self, test_id: int, attempt_data: AnswerCreate) -> UserAttemps:
         test = self._get_test_or_raise(test_id)
         
         if test.content is None:
@@ -73,8 +73,6 @@ class TestService:
         
         
         total_score, max_score = self._compute_score(test.content, attempt_data.answers)
-        
-        print(attempt_data.model_dump())
         
         attempt = UserAttemps(**attempt_data.model_dump())
         attempt.test_id = test_id
@@ -85,7 +83,23 @@ class TestService:
         self._db.commit()
         self._db.refresh(attempt)
         
+        return attempt
 
+
+
+    def get_attempts_and_course(self, user_id: int, course_id: int) -> list[UserAttemps]:
+        course = self._db.get(Course, course_id)
+        
+        if course is None:
+            raise NoResultFound()
+        
+        stmt = select(UserAttemps).filter(UserAttemps.user_id == user_id)
+        
+        attemps_list = self._db.scalars(stmt).all()
+        
+        attemps_list = [i for i in attemps_list if i.test.section.course_id == course_id]
+        
+        return attemps_list
     
     def _get_test_or_raise(self, test_id: int) -> Test:
         test = self.get_test(test_id)

@@ -116,6 +116,14 @@ class CourseSection(Base):
         back_populates="section",
         cascade="all, delete-orphan"
     )
+    videos: Mapped[list["Video"]] = relationship(
+        back_populates="section",
+        cascade="all, delete-orphan"
+    )
+    resources: Mapped[list["Resource"]] = relationship(
+        back_populates="section",
+        cascade="all, delete-orphan"
+    )
     
     course: Mapped[Course] = relationship(back_populates="sections")
 
@@ -183,7 +191,7 @@ class Test(SectionContent):
     max_attempts: Mapped[Optional[int]]
     
     section: Mapped[CourseSection] = relationship(back_populates="tests")
-
+    attempts: Mapped[list["UserAttemps"]] = relationship(back_populates="test")
 
 
 class UserAttemps(Base):
@@ -196,8 +204,51 @@ class UserAttemps(Base):
     answers: Mapped[str] = mapped_column(JSON)
     score: Mapped[Optional[int]]
     max_score: Mapped[int]
+
+    test: Mapped[Test] = relationship(back_populates="attempts")
+
+
+class Video(SectionContent):
+    __tablename__ = "videos"
+
+    video_url: Mapped[str]
+
+    section: Mapped[CourseSection] = relationship(back_populates="videos")
+
+    
+
+class Resource(SectionContent):
+    __tablename__ = "resources"
+    
+    file_id: Mapped[int] = mapped_column(ForeignKey("files.id"))
+    
+    file: Mapped[File] = relationship()
+    section: Mapped[CourseSection] = relationship(back_populates="resources")
+
+
+class UsersCompletedResources(Base):
+    __tablename__ = "completed_resources"
+    
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
+    resource_id: Mapped[int] = mapped_column(ForeignKey("resources.id"))
+    completions_date: Mapped[datetime] = mapped_column(
+        DateTime,
+        server_default=text("CURRENT_TIMESTAMP")
+    )
     
     
+class UsersCompletedVideos(Base):
+    __tablename__ = "completed_videos"
+    
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
+    videos_id: Mapped[int] = mapped_column(ForeignKey("videos.id"))
+    completions_date: Mapped[datetime] = mapped_column(
+        DateTime,
+        server_default=text("CURRENT_TIMESTAMP")
+    )
+
+
+  
 class CourseUser(Base):
     __tablename__ = "course_users"
     

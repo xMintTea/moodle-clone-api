@@ -1,8 +1,9 @@
 from pydantic import BaseModel, Field, EmailStr, ConfigDict
-from typing import Annotated
+from typing import Annotated, Optional
 
 from ..models.context.enums import UserStatus, UserType
 from ..utils.schemas_utils import optional
+from ..schemas.groups import GroupResponse
 
 
 
@@ -25,6 +26,7 @@ class UserBase(BaseModel):
 class UserCreate(UserBase):
     password: Annotated[str, Field(..., min_length=8, max_length=18)]
     email: Annotated[EmailStr, Field(..., max_length=32)]
+    group_id: Annotated[Optional[int], Field(None, ge=1)]
 
 @optional
 class UserUpdate(UserCreate):
@@ -32,4 +34,6 @@ class UserUpdate(UserCreate):
 
 
 class UserResponse(UserBase):
+    group: Optional[GroupResponse]
+    
     model_config = ConfigDict(from_attributes=True)

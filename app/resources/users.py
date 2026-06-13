@@ -20,10 +20,11 @@ def get_users_dependency():
     def dependency(
         skip: int = Query(0, ge=0),
         limit: int = Query(100, ge=1, le=1000),
+        group_name: Optional[str] = Query(None),
         user_service: UserService = Depends(get_user_service),
         user: User = Depends(get_verified_user)
         ) -> list[User]:
-        return user_service.list_users(skip,limit)
+        return user_service.list_users(skip,limit, group_name)
 
     return dependency
 

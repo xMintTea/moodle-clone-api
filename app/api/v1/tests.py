@@ -13,7 +13,8 @@ from ...resources.tests import (
     update_test_dependency,
     delete_test_dependency,
     get_attempts_dependency,
-    create_attempt_dependency
+    create_attempt_dependency,
+    get_user_tests_attempts_dependency
 )
 
 
@@ -65,6 +66,13 @@ def get_attempts(
 
 @router.post("/{test_id}/attempts")
 def create_attempt(
-    attemps = Depends(create_attempt_dependency())
+    attempt = Depends(create_attempt_dependency())
 ):
-    ...
+    return attempt
+
+
+@router.get("/attempts/{user_id}")
+def get_user_tests_attempts(
+    attempts = Depends(get_user_tests_attempts_dependency())
+):
+    return attempts

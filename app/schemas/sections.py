@@ -6,6 +6,8 @@ from ..utils.schemas_utils import optional
 from ..models.context.enums import Visibility
 from .pages import PageResponse
 from .tests import TestResponse
+from .videos import VideoResponse
+from .resources import ResourceResponse
 
 
 # -------- Sections --------
@@ -31,5 +33,7 @@ class SectionResponse(SectionBase):
     
     pages: list[PageResponse]
     tests: list[TestResponse]
+    videos: list[VideoResponse]
+    resources: list[ResourceResponse]
     
     model_config = ConfigDict(from_attributes=True)

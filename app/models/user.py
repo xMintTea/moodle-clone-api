@@ -1,6 +1,7 @@
-from sqlalchemy import String, Enum
+from sqlalchemy import String, Enum, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from pydantic import EmailStr
+from typing import Optional
 
 from ..database import Base
 from ..models.context.enums import UserStatus, UserType
@@ -17,8 +18,10 @@ class User(Base):
     user_type: Mapped[UserType] = mapped_column(Enum(UserType))
     user_status: Mapped[UserStatus] = mapped_column(Enum(UserStatus))
     
-    courses: Mapped[list["Course"]] = relationship(back_populates="users", secondary="course_users") # type: ignore
+    group_id: Mapped[Optional[int]] = mapped_column(ForeignKey("student_groups.id"), nullable=True)
     
+    courses: Mapped[list["Course"]] = relationship(back_populates="users", secondary="course_users") # type: ignore
+    group: Mapped[Optional["StudentGroup"]] = relationship(uselist=False)
 
     @property
     def full_name(self) -> str:
@@ -28,3 +31,11 @@ class User(Base):
     
     def __str__(self) -> EmailStr:
         return f"{self.full_name}[{self.id}]"
+    
+    
+class StudentGroup(Base):
+    __tablename__ = "student_groups"
+    
+    name: Mapped[str]
+    
+    users: Mapped[list[User]] = relationship(back_populates="group")

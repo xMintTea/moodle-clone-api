@@ -5,6 +5,7 @@ from typing import Optional
 from pydantic import EmailStr
 
 from ..models.user import User
+from ..models.course import CourseUser
 from ..schemas.user import UserCreate, UserUpdate
 from ..schemas.auth import Login, Token
 from ..utils import password as pw_utils
@@ -16,9 +17,24 @@ class UserService:
         self._db = session
     
     
-    def list_users(self, skip: int = 0, limit: int = 100) -> list[User]:
-        stmt = select(User).offset(skip).limit(limit)
-        return list(self._db.scalars(stmt).all())
+    def list_users(self, skip: int = 0, limit: int = 100,course_id: Optional[int] = None, group_name: Optional[str] = None) -> list[User]:
+        stmt = select(User)
+        
+        if group_name is not None:
+            stmt = stmt.filter(User.group.name == group_name)
+        
+        stmt = stmt.offset(skip).limit(limit)
+        
+        users = list(self._db.scalars(stmt).all())
+        
+        if course_id is not None:
+            smt = select(CourseUser).filter(CourseUser.course_id == course_id)
+            users_in_course = self._db.scalars(smt).all()
+            users_id_in_course = [i.user_id for i in users_in_course]
+            
+            users = [i for i in users if i in users_id_in_course]
+            
+        return users
     
     def get_user(self, user_id: int) -> Optional[User]:
         return self._db.get(User, user_id)

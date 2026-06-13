@@ -7,7 +7,7 @@ import json
 
 from ..service.test_service import TestService
 from ..database import get_db
-from ..models.course import Test
+from ..models.course import Test, UserAttemps
 from ..models.user import User
 from ..models.context.enums import UserType, Visibility
 from ..schemas.tests import TestCreate, TestUpdate, TestResponse
@@ -195,8 +195,26 @@ def create_attempt_dependency():
         attempt_data: AnswerCreate,
         test_service: TestService = Depends(get_test_service),
         user: User = Depends(get_verified_user)
-    ):
+    ) -> UserAttemps:
         same_user = user.id == attempt_data.user_id
-        test_service.create_attempt(test_id, attempt_data)
+        
+        if same_user:
+            return test_service.create_attempt(test_id, attempt_data)
+        
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
+    
+    return dependency
+
+
+
+def get_user_tests_attempts_dependency():
+    def dependency(
+        user_id: Annotated[int, Path(ge=1)],
+        course_id: Annotated[int, Query(ge=1)],
+        test_service: TestService = Depends(get_test_service),
+        user: User = Depends(get_verified_user)
+    ) -> list[UserAttemps]:
+        return test_service.get_attempts_and_course(user_id, course_id)
+    
     
     return dependency

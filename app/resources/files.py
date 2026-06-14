@@ -42,12 +42,6 @@ def get_file_dependency():
         if file is None:
             raise NoResultFound
         
-        is_owner = user.user_type == 1 and user.id == file.uploader_id
-        have_power = user.user_type == UserType.REDACTOR or user.user_type == UserType.ADMIN
-        
-        if not (is_owner or have_power):
-            raise HTTPException(status_code=403)
-        
         return file
     
     return dependency
@@ -66,12 +60,6 @@ def stream_file_dependency():
         if file is None:
             raise NoResultFound
         
-        is_owner = user.user_type == 1 and user.id == file.uploader_id
-        have_power = user.user_type == UserType.REDACTOR or user.user_type == UserType.ADMIN
-        
-        
-        if not (is_owner or have_power):
-            raise HTTPException(status_code=403)
         
         return file_stream
     
